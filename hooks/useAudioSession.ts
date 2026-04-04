@@ -6,7 +6,7 @@ import {
 } from "expo-audio";
 import { AUDIO_CONFIG } from "@/constants/config";
 
-const audioSource = require("@/assets/audio/100hz.mp3");
+const audioSource = require("@/assets/audio/100hz.wav");
 
 type AudioState = "idle" | "playing" | "completed";
 
