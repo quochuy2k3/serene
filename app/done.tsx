@@ -1,7 +1,15 @@
+import { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
+import { Ionicons } from "@expo/vector-icons";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withDelay,
+} from "react-native-reanimated";
 import {
   colors,
   fonts,
@@ -13,11 +21,38 @@ import {
   shadows,
 } from "@/constants/theme";
 import { Button } from "@/components/Button";
+import { useHaptics } from "@/hooks/useHaptics";
+import {
+  useScreenEntrance,
+  useStaggeredEntrance,
+} from "@/hooks/useScreenEntrance";
 
 export default function DoneScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const haptics = useHaptics();
+
+  // Badge bounce-in animation
+  const badgeScale = useSharedValue(0);
+  const badgeOpacity = useSharedValue(0);
+
+  useEffect(() => {
+    haptics.success();
+    badgeOpacity.value = withSpring(1, { damping: 14, stiffness: 180 });
+    badgeScale.value = withDelay(
+      100,
+      withSpring(1, { damping: 10, stiffness: 150 })
+    );
+  }, [haptics, badgeScale, badgeOpacity]);
+
+  const badgeStyle = useAnimatedStyle(() => ({
+    opacity: badgeOpacity.value,
+    transform: [{ scale: badgeScale.value }],
+  }));
+
+  const textEntrance = useStaggeredEntrance(3, 120);
+  const actionsEntrance = useStaggeredEntrance(5, 120);
 
   return (
     <View
@@ -30,24 +65,37 @@ export default function DoneScreen() {
       ]}
     >
       <View style={styles.content}>
-        {/* Decorative check badge */}
-        <View style={styles.badgeOuter}>
+        {/* Decorative check badge — bounces in */}
+        <Animated.View style={[styles.badgeOuter, badgeStyle]}>
           <View style={styles.badgeInner}>
-            <Text style={styles.badgeCheck}>✓</Text>
+            <Ionicons name="checkmark" size={52} color={colors.textInverse} />
           </View>
-        </View>
+        </Animated.View>
 
-        <Text style={styles.eyebrow}>{t("done.eyebrow")}</Text>
-        <Text style={styles.title}>{t("done.title")}</Text>
-        <Text style={styles.message}>{t("done.message")}</Text>
+        <Animated.View style={[styles.textBlock, textEntrance]}>
+          <Text style={styles.eyebrow}>{t("done.eyebrow")}</Text>
+          <Text style={styles.title}>{t("done.title")}</Text>
+          <Text style={styles.message}>{t("done.message")}</Text>
 
-        <View style={styles.durationCard}>
-          <Text style={styles.durationLabel}>{t("done.durationLabel")}</Text>
-          <Text style={styles.durationValue}>{t("done.effectDuration")}</Text>
-        </View>
+          <View style={styles.durationCard}>
+            <Ionicons
+              name="time-outline"
+              size={18}
+              color={colors.primary}
+            />
+            <View>
+              <Text style={styles.durationLabel}>
+                {t("done.durationLabel")}
+              </Text>
+              <Text style={styles.durationValue}>
+                {t("done.effectDuration")}
+              </Text>
+            </View>
+          </View>
+        </Animated.View>
       </View>
 
-      <View style={styles.actions}>
+      <Animated.View style={[styles.actions, actionsEntrance]}>
         <Button
           label={t("done.enableMotionCues")}
           onPress={() => router.replace("/(tabs)/motion-cues")}
@@ -62,7 +110,7 @@ export default function DoneScreen() {
           size="md"
           fullWidth
         />
-      </View>
+      </Animated.View>
 
       <Text style={styles.disclaimer}>{t("done.disclaimer")}</Text>
     </View>
@@ -98,11 +146,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     ...shadows.sm,
   },
-  badgeCheck: {
-    fontSize: 44,
-    color: colors.textInverse,
-    fontFamily: fonts.bold,
-    lineHeight: 48,
+  textBlock: {
+    alignItems: "center",
   },
   eyebrow: {
     fontFamily: fonts.semiBold,
@@ -131,11 +176,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   durationCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
     backgroundColor: colors.surface,
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.md,
-    alignItems: "center",
     ...shadows.xs,
   },
   durationLabel: {

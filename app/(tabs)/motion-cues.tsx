@@ -9,6 +9,7 @@ import {
   Switch,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Ionicons } from "@expo/vector-icons";
 import {
   colors,
   fonts,
@@ -21,6 +22,7 @@ import {
 } from "@/constants/theme";
 import { Button } from "@/components/Button";
 import { Header } from "@/components/Header";
+import { PulsingDot } from "@/components/PulsingDot";
 import {
   OnboardingSlides,
   type Slide,
@@ -53,23 +55,25 @@ function AndroidSlide2Explanation() {
   const { t } = useTranslation();
   return (
     <View style={slideStyles.center}>
-      <Text style={slideStyles.emoji}>🧠</Text>
+      <View style={slideStyles.iconBadge}>
+        <Ionicons name="sync-outline" size={40} color={colors.primary} />
+      </View>
       <Text style={slideStyles.heading}>
         {t("motionCues.android.onboarding.slide2Title")}
       </Text>
       <View style={slideStyles.flowList}>
         <FlowItem
-          icon="👁"
+          icon="eye-outline"
           text={t("motionCues.android.onboarding.slide2Eye")}
         />
         <View style={slideStyles.flowArrow} />
         <FlowItem
-          icon="👂"
+          icon="ear-outline"
           text={t("motionCues.android.onboarding.slide2Ear")}
         />
         <View style={slideStyles.flowArrow} />
         <FlowItem
-          icon="🧠"
+          icon="sparkles-outline"
           text={t("motionCues.android.onboarding.slide2Brain")}
         />
       </View>
@@ -84,21 +88,33 @@ function AndroidSlide3Permission() {
   const { t } = useTranslation();
   return (
     <View style={slideStyles.center}>
-      <Text style={slideStyles.emoji}>🔒</Text>
+      <View style={slideStyles.iconBadge}>
+        <Ionicons
+          name="shield-checkmark-outline"
+          size={40}
+          color={colors.primary}
+        />
+      </View>
       <Text style={slideStyles.heading}>
         {t("motionCues.android.onboarding.slide3Title")}
       </Text>
       <View style={slideStyles.permissionCard}>
-        <Text style={slideStyles.permissionFeature}>
-          ⚙️ {t("motionCues.android.onboarding.slide3Feature")}
-        </Text>
+        <View style={slideStyles.permissionHeader}>
+          <Ionicons name="layers-outline" size={20} color={colors.primary} />
+          <Text style={slideStyles.permissionFeature}>
+            {t("motionCues.android.onboarding.slide3Feature")}
+          </Text>
+        </View>
         <Text style={slideStyles.permissionReason}>
           {t("motionCues.android.onboarding.slide3Reason")}
         </Text>
       </View>
-      <Text style={slideStyles.privacy}>
-        🔐 {t("motionCues.android.onboarding.slide3Privacy")}
-      </Text>
+      <View style={slideStyles.privacyRow}>
+        <Ionicons name="lock-closed-outline" size={14} color={colors.primary} />
+        <Text style={slideStyles.privacy}>
+          {t("motionCues.android.onboarding.slide3Privacy")}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -111,7 +127,9 @@ function IOSSlide1Intro() {
   const { t } = useTranslation();
   return (
     <View style={slideStyles.center}>
-      <Text style={slideStyles.emoji}>🍎</Text>
+      <View style={slideStyles.iconBadge}>
+        <Ionicons name="logo-apple" size={44} color={colors.textPrimary} />
+      </View>
       <Text style={slideStyles.heading}>
         {t("motionCues.ios.onboarding.slide1Title")}
       </Text>
@@ -131,6 +149,7 @@ function IOSSlide2Guide() {
     <ScrollView
       style={{ flex: 1 }}
       contentContainerStyle={slideStyles.scrollContent}
+      showsVerticalScrollIndicator={false}
     >
       <Text style={slideStyles.heading}>
         {t("motionCues.ios.onboarding.slide2Title")}
@@ -153,9 +172,16 @@ function IOSSlide2Guide() {
           text={t("motionCues.ios.onboarding.slide2Step4")}
         />
       </View>
-      <Text style={slideStyles.tip}>
-        💡 {t("motionCues.ios.onboarding.slide2Tip")}
-      </Text>
+      <View style={slideStyles.tipRow}>
+        <Ionicons
+          name="bulb-outline"
+          size={14}
+          color={colors.textTertiary}
+        />
+        <Text style={slideStyles.tip}>
+          {t("motionCues.ios.onboarding.slide2Tip")}
+        </Text>
+      </View>
     </ScrollView>
   );
 }
@@ -164,7 +190,13 @@ function IOSSlide3DeepLink() {
   const { t } = useTranslation();
   return (
     <View style={slideStyles.center}>
-      <Text style={slideStyles.emoji}>⚙️</Text>
+      <View style={slideStyles.iconBadge}>
+        <Ionicons
+          name="settings-outline"
+          size={40}
+          color={colors.primary}
+        />
+      </View>
       <Text style={slideStyles.heading}>
         {t("motionCues.ios.onboarding.slide3Title")}
       </Text>
@@ -179,10 +211,18 @@ function IOSSlide3DeepLink() {
 // Helpers
 // ============================================================
 
-function FlowItem({ icon, text }: { icon: string; text: string }) {
+function FlowItem({
+  icon,
+  text,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  text: string;
+}) {
   return (
     <View style={slideStyles.flowItem}>
-      <Text style={slideStyles.flowIcon}>{icon}</Text>
+      <View style={slideStyles.flowIconBox}>
+        <Ionicons name={icon} size={18} color={colors.primary} />
+      </View>
       <Text style={slideStyles.flowText}>{text}</Text>
     </View>
   );
@@ -585,6 +625,15 @@ const slideStyles = StyleSheet.create({
     lineHeight: 22,
     paddingHorizontal: spacing.md,
   },
+  iconBadge: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.primarySoft,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.sm,
+  },
   flowList: {
     alignItems: "center",
     marginVertical: spacing.md,
@@ -595,14 +644,19 @@ const slideStyles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.md,
     backgroundColor: colors.surface,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
-    minWidth: 240,
-    ...shadows.sm,
+    minWidth: 260,
+    ...shadows.xs,
   },
-  flowIcon: {
-    fontSize: 24,
+  flowIconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.primarySoft,
+    alignItems: "center",
+    justifyContent: "center",
   },
   flowText: {
     fontFamily: fonts.medium,
@@ -633,11 +687,16 @@ const slideStyles = StyleSheet.create({
     width: "100%",
     ...shadows.sm,
   },
+  permissionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
   permissionFeature: {
-    fontFamily: fonts.semiBold,
-    fontSize: fontSizes.lg,
+    fontFamily: fonts.bold,
+    fontSize: fontSizes.md,
     color: colors.textPrimary,
-    marginBottom: spacing.xs,
   },
   permissionReason: {
     fontFamily: fonts.regular,
@@ -645,12 +704,19 @@ const slideStyles = StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 20,
   },
+  privacyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
   privacy: {
     fontFamily: fonts.medium,
     fontSize: fontSizes.sm,
     color: colors.primary,
     textAlign: "center",
-    marginTop: spacing.sm,
+    flex: 1,
   },
   steps: {
     gap: spacing.md,
@@ -680,13 +746,18 @@ const slideStyles = StyleSheet.create({
     color: colors.textPrimary,
     flex: 1,
   },
+  tipRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.md,
+  },
   tip: {
     fontFamily: fonts.regular,
     fontSize: fontSizes.sm,
     color: colors.textSecondary,
-    fontStyle: "italic",
-    textAlign: "center",
-    marginTop: spacing.md,
+    flex: 1,
   },
 });
 

@@ -9,6 +9,7 @@ import {
   StyleProp,
 } from "react-native";
 import { colors, fonts, fontSizes, spacing, borderRadius } from "@/constants/theme";
+import { useHaptics } from "@/hooks/useHaptics";
 
 type ButtonVariant = "primary" | "secondary" | "inverted" | "outlined" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
@@ -22,6 +23,7 @@ type ButtonProps = {
   loading?: boolean;
   fullWidth?: boolean;
   icon?: ReactNode;
+  haptic?: "tap" | "medium" | "success" | "none";
   style?: StyleProp<ViewStyle>;
 };
 
@@ -34,9 +36,18 @@ export function Button({
   loading = false,
   fullWidth = false,
   icon,
+  haptic = "tap",
   style,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
+  const haptics = useHaptics();
+
+  const handlePress = () => {
+    if (haptic !== "none") {
+      haptics[haptic]?.();
+    }
+    onPress?.();
+  };
 
   const containerStyle: StyleProp<ViewStyle>[] = [
     styles.base,
@@ -61,7 +72,7 @@ export function Button({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       disabled={isDisabled}
       style={({ pressed }) => [
         containerStyle,

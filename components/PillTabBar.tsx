@@ -14,6 +14,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { TabIcon, type TabIconName } from "./TabIcon";
+import { useHaptics } from "@/hooks/useHaptics";
 import {
   colors,
   fonts,
@@ -43,6 +44,7 @@ export function PillTabBar({
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
+  const haptics = useHaptics();
 
   const barWidth = screenWidth - SIDE_MARGIN * 2;
   const tabWidth = barWidth / state.routes.length;
@@ -123,6 +125,7 @@ export function PillTabBar({
             });
 
             if (!isFocused && !event.defaultPrevented) {
+              haptics.select();
               navigation.navigate(route.name, route.params);
             }
           };

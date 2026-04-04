@@ -6,6 +6,8 @@ import {
   Pressable,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Ionicons } from "@expo/vector-icons";
+import Animated from "react-native-reanimated";
 import {
   colors,
   fonts,
@@ -19,16 +21,34 @@ import {
 import { APP_CONFIG } from "@/constants/config";
 import { Header } from "@/components/Header";
 import { useSettings } from "@/hooks/useSettings";
+import { useHaptics } from "@/hooks/useHaptics";
+import {
+  useScreenEntrance,
+  useStaggeredEntrance,
+} from "@/hooks/useScreenEntrance";
 
 const TAB_BAR_CLEARANCE = 120;
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const { settings, updateSettings } = useSettings();
+  const haptics = useHaptics();
+
+  const headerEntrance = useScreenEntrance(0);
+  const section1Entrance = useStaggeredEntrance(1);
+  const section2Entrance = useStaggeredEntrance(2);
+  const section3Entrance = useStaggeredEntrance(3);
+  const aboutEntrance = useStaggeredEntrance(4);
 
   const toggleLanguage = () => {
+    haptics.select();
     const newLang = i18n.language === "en" ? "vi" : "en";
     i18n.changeLanguage(newLang);
+  };
+
+  const handleSegmentPress = (updater: () => void) => {
+    haptics.select();
+    updater();
   };
 
   const dotSizeOptions = [
@@ -45,11 +65,13 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <Header
-        eyebrow={t("settings.eyebrow")}
-        title={t("settings.title")}
-        description={t("settings.description")}
-      />
+      <Animated.View style={headerEntrance}>
+        <Header
+          eyebrow={t("settings.eyebrow")}
+          title={t("settings.title")}
+          description={t("settings.description")}
+        />
+      </Animated.View>
 
       <ScrollView
         style={styles.scroll}
@@ -57,7 +79,7 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Dot Size */}
-        <View style={styles.section}>
+        <Animated.View style={[styles.section, section1Entrance]}>
           <Text style={styles.sectionLabel}>{t("settings.dotSize")}</Text>
           <View style={styles.segmented}>
             {dotSizeOptions.map(({ key, value }) => {
@@ -65,7 +87,9 @@ export default function SettingsScreen() {
               return (
                 <Pressable
                   key={value}
-                  onPress={() => updateSettings({ dotSize: value })}
+                  onPress={() =>
+                    handleSegmentPress(() => updateSettings({ dotSize: value }))
+                  }
                   style={[styles.segment, active && styles.segmentActive]}
                 >
                   <Text
@@ -80,10 +104,10 @@ export default function SettingsScreen() {
               );
             })}
           </View>
-        </View>
+        </Animated.View>
 
         {/* Sensitivity */}
-        <View style={styles.section}>
+        <Animated.View style={[styles.section, section2Entrance]}>
           <Text style={styles.sectionLabel}>{t("settings.sensitivity")}</Text>
           <View style={styles.segmented}>
             {sensitivityOptions.map(({ key, value }) => {
@@ -91,7 +115,11 @@ export default function SettingsScreen() {
               return (
                 <Pressable
                   key={value}
-                  onPress={() => updateSettings({ sensitivity: value })}
+                  onPress={() =>
+                    handleSegmentPress(() =>
+                      updateSettings({ sensitivity: value })
+                    )
+                  }
                   style={[styles.segment, active && styles.segmentActive]}
                 >
                   <Text
@@ -106,32 +134,61 @@ export default function SettingsScreen() {
               );
             })}
           </View>
-        </View>
+        </Animated.View>
 
         {/* Language */}
-        <View style={styles.section}>
+        <Animated.View style={[styles.section, section3Entrance]}>
           <Text style={styles.sectionLabel}>{t("settings.language")}</Text>
           <Pressable style={styles.row} onPress={toggleLanguage}>
-            <Text style={styles.rowLabel}>
-              {i18n.language === "en" ? "English" : "Tiếng Việt"}
-            </Text>
-            <Text style={styles.rowChevron}>→</Text>
+            <View style={styles.rowLeft}>
+              <Ionicons
+                name="language-outline"
+                size={20}
+                color={colors.primary}
+              />
+              <Text style={styles.rowLabel}>
+                {i18n.language === "en" ? "English" : "Tiếng Việt"}
+              </Text>
+            </View>
+            <Ionicons
+              name="swap-horizontal"
+              size={18}
+              color={colors.textTertiary}
+            />
           </Pressable>
-        </View>
+        </Animated.View>
 
         {/* About */}
-        <View style={styles.aboutCard}>
-          <Text style={styles.aboutEyebrow}>{t("settings.about")}</Text>
-          <Text style={styles.aboutTitle}>{APP_CONFIG.name}</Text>
+        <Animated.View style={[styles.aboutCard, aboutEntrance]}>
+          <View style={styles.aboutIconRow}>
+            <View style={styles.aboutIconBox}>
+              <Ionicons
+                name="leaf-outline"
+                size={22}
+                color={colors.primary}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.aboutEyebrow}>{t("settings.about")}</Text>
+              <Text style={styles.aboutTitle}>{APP_CONFIG.name}</Text>
+            </View>
+          </View>
           <Text style={styles.aboutText}>
             {t("settings.aboutDescription")}
           </Text>
           <View style={styles.aboutDivider} />
-          <Text style={styles.research}>{t("settings.research")}</Text>
+          <View style={styles.aboutFooter}>
+            <Ionicons
+              name="school-outline"
+              size={14}
+              color={colors.primary}
+            />
+            <Text style={styles.research}>{t("settings.research")}</Text>
+          </View>
           <Text style={styles.version}>
             {t("settings.version")} {APP_CONFIG.version}
           </Text>
-        </View>
+        </Animated.View>
       </ScrollView>
     </View>
   );
@@ -194,15 +251,15 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     ...shadows.xs,
   },
+  rowLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+  },
   rowLabel: {
     fontFamily: fonts.medium,
     fontSize: fontSizes.md,
     color: colors.textPrimary,
-  },
-  rowChevron: {
-    fontFamily: fonts.semiBold,
-    fontSize: fontSizes.lg,
-    color: colors.primary,
   },
   aboutCard: {
     backgroundColor: colors.surface,
@@ -211,12 +268,31 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     ...shadows.sm,
   },
+  aboutIconRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  aboutIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.primarySoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   aboutEyebrow: {
     fontFamily: fonts.semiBold,
     fontSize: fontSizes.xs,
     color: colors.primary,
     letterSpacing: letterSpacing.wide + 0.5,
     textTransform: "uppercase",
+  },
+  aboutFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
   },
   aboutTitle: {
     fontFamily: fonts.bold,

@@ -1,6 +1,8 @@
 import { View, Text, StyleSheet, Pressable, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useHaptics } from "@/hooks/useHaptics";
 import {
   colors,
   fonts,
@@ -37,8 +39,10 @@ export function Header({
 }: HeaderProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const haptics = useHaptics();
 
   const handleBack = () => {
+    haptics.tap();
     if (onBack) onBack();
     else router.back();
   };
@@ -61,7 +65,7 @@ export function Header({
           accessibilityLabel="Back"
         >
           <View style={styles.backIconWrap}>
-            <Text style={styles.backArrow}>←</Text>
+            <Ionicons name="chevron-back" size={22} color={colors.textPrimary} />
           </View>
         </Pressable>
       )}
@@ -122,12 +126,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
-  },
-  backArrow: {
-    fontFamily: fonts.medium,
-    fontSize: 20,
-    color: colors.textPrimary,
-    lineHeight: 22,
   },
   centerWrap: {
     alignItems: "center",
