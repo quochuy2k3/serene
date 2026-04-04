@@ -10,7 +10,10 @@ import {
   Manrope_800ExtraBold,
 } from "@expo-google-fonts/manrope";
 import * as SplashScreen from "expo-splash-screen";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { i18nPromise } from "@/i18n";
+import { SettingsProvider } from "@/hooks/useSettings";
 import { colors } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
@@ -41,14 +44,18 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      />
-    </>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <SettingsProvider>
+          <StatusBar style="dark" />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: colors.background },
+            }}
+          />
+        </SettingsProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

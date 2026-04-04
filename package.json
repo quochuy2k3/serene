@@ -30,9 +30,10 @@
     "react-i18next": "^17.0.2",
     "react-native": "0.81.5",
     "react-native-gesture-handler": "^2.28.0",
-    "react-native-reanimated": "^4.1.7",
+    "react-native-reanimated": "4.1.7",
     "react-native-safe-area-context": "^5.6.2",
     "react-native-screens": "^4.16.0",
+    "react-native-svg": "15.12.1",
     "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
@@ -40,5 +41,25 @@
     "typescript": "~5.9.2"
   },
   "private": true,
-  "packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc"
+  "packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc",
+  "pnpm": {
+    "overrides": {
+      "metro": "0.83.3",
+      "metro-config": "0.83.3",
+      "metro-core": "0.83.3",
+      "metro-cache": "0.83.3",
+      "metro-cache-key": "0.83.3",
+      "metro-file-map": "0.83.3",
+      "metro-resolver": "0.83.3",
+      "metro-runtime": "0.83.3",
+      "metro-source-map": "0.83.3",
+      "metro-symbolicate": "0.83.3",
+      "metro-babel-transformer": "0.83.3",
+      "metro-transform-plugins": "0.83.3",
+      "metro-transform-worker": "0.83.3",
+      "metro-minify-terser": "0.83.3",
+      "react-native-reanimated": "4.1.7",
+      "react-native-worklets": "0.5.1"
+    }
+  }
 }
