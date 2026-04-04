@@ -29,7 +29,8 @@
       "expo-router",
       "expo-localization",
       "expo-sensors",
-      "expo-audio"
+      "expo-audio",
+      "expo-font"
     ]
   }
 }
