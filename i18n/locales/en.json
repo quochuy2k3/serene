@@ -1,0 +1,82 @@
+{
+  "common": {
+    "appName": "Serene",
+    "tagline": "Calm every journey",
+    "start": "Start",
+    "stop": "Stop",
+    "back": "Back",
+    "settings": "Settings",
+    "on": "On",
+    "off": "Off",
+    "enable": "Enable",
+    "disable": "Disable"
+  },
+  "home": {
+    "listen100Hz": "Listen 100 Hz",
+    "listenDescription": "60-second audio therapy to help reduce motion sickness",
+    "motionCues": "Motion Cues",
+    "motionCuesDescription": "Visual dots that move with your vehicle",
+    "overlayStatus": "Overlay: {{status}}"
+  },
+  "audio": {
+    "title": "Audio Therapy",
+    "volumeGuide": "Put on headphones and set volume to a comfortable level",
+    "volumeTip": "The sound should be clearly audible but not uncomfortable",
+    "startListening": "Start Listening",
+    "countdown": "{{seconds}}s remaining",
+    "listening": "Listening..."
+  },
+  "done": {
+    "title": "All Done!",
+    "message": "The 100 Hz therapy session is complete",
+    "effectDuration": "Effects may last up to ~2 hours",
+    "listenAgain": "Listen Again",
+    "enableMotionCues": "Enable Motion Cues",
+    "disclaimer": "Results may vary by individual. Based on research from Nagoya University."
+  },
+  "motionCues": {
+    "title": "Motion Cues",
+    "status": "Status",
+    "howItWorks": "8 subtle dots on your screen edges move with your vehicle's motion, helping your brain reconcile what your eyes see with what your body feels.",
+    "android": {
+      "permissionRequired": "Overlay permission required",
+      "permissionDescription": "Serene needs permission to display dots over other apps",
+      "grantPermission": "Grant Permission",
+      "startOverlay": "Start Overlay",
+      "stopOverlay": "Stop Overlay",
+      "overlayActive": "Overlay is active — works across all apps"
+    },
+    "ios": {
+      "inAppOverlay": "In-App Overlay",
+      "appleGuide": "Apple Vehicle Motion Cues",
+      "guideIntro": "iOS has a built-in feature that works system-wide. Follow these steps to enable it:",
+      "step1": "Open Settings",
+      "step2": "Tap Accessibility",
+      "step3": "Tap Motion",
+      "step4": "Enable Vehicle Motion Cues",
+      "openSettings": "Open Accessibility Settings"
+    },
+    "onboarding": {
+      "getStarted": "Get Started",
+      "next": "Next",
+      "skip": "Skip"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "dotSize": "Dot Size",
+    "dotSizeSmall": "Small",
+    "dotSizeMedium": "Medium",
+    "dotSizeLarge": "Large",
+    "dotOpacity": "Dot Opacity",
+    "sensitivity": "Sensitivity",
+    "sensitivityLow": "Low",
+    "sensitivityMedium": "Medium",
+    "sensitivityHigh": "High",
+    "about": "About",
+    "aboutDescription": "Serene combines 100 Hz audio therapy and motion cues overlay to help reduce motion sickness symptoms during travel.",
+    "research": "Based on research from Nagoya University, Japan",
+    "version": "Version",
+    "language": "Language"
+  }
+}

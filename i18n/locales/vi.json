@@ -1,0 +1,82 @@
+{
+  "common": {
+    "appName": "Serene",
+    "tagline": "Bình yên mọi chuyến đi",
+    "start": "Bắt đầu",
+    "stop": "Dừng",
+    "back": "Quay lại",
+    "settings": "Cài đặt",
+    "on": "Bật",
+    "off": "Tắt",
+    "enable": "Bật",
+    "disable": "Tắt"
+  },
+  "home": {
+    "listen100Hz": "Nghe 100 Hz",
+    "listenDescription": "Liệu pháp âm thanh 60 giây giúp giảm say xe",
+    "motionCues": "Motion Cues",
+    "motionCuesDescription": "Các chấm tròn di chuyển theo xe của bạn",
+    "overlayStatus": "Overlay: {{status}}"
+  },
+  "audio": {
+    "title": "Liệu pháp âm thanh",
+    "volumeGuide": "Đeo tai nghe và chỉnh âm lượng ở mức thoải mái",
+    "volumeTip": "Âm thanh nên nghe rõ nhưng không khó chịu",
+    "startListening": "Bắt đầu nghe",
+    "countdown": "Còn {{seconds}} giây",
+    "listening": "Đang phát..."
+  },
+  "done": {
+    "title": "Hoàn tất!",
+    "message": "Phiên liệu pháp 100 Hz đã kết thúc",
+    "effectDuration": "Hiệu quả có thể kéo dài ~2 giờ",
+    "listenAgain": "Nghe lại",
+    "enableMotionCues": "Bật Motion Cues",
+    "disclaimer": "Hiệu quả có thể khác nhau tùy người. Dựa trên nghiên cứu từ Đại học Nagoya."
+  },
+  "motionCues": {
+    "title": "Motion Cues",
+    "status": "Trạng thái",
+    "howItWorks": "8 chấm tròn nhỏ ở viền màn hình di chuyển theo chuyển động xe, giúp não bộ đồng bộ những gì mắt nhìn thấy với cảm nhận của cơ thể.",
+    "android": {
+      "permissionRequired": "Cần quyền hiển thị overlay",
+      "permissionDescription": "Serene cần quyền hiển thị chấm tròn trên các ứng dụng khác",
+      "grantPermission": "Cấp quyền",
+      "startOverlay": "Bật Overlay",
+      "stopOverlay": "Tắt Overlay",
+      "overlayActive": "Overlay đang hoạt động — hiển thị trên mọi ứng dụng"
+    },
+    "ios": {
+      "inAppOverlay": "Overlay trong ứng dụng",
+      "appleGuide": "Vehicle Motion Cues của Apple",
+      "guideIntro": "iOS có tính năng tích hợp hoạt động trên toàn hệ thống. Làm theo các bước sau để bật:",
+      "step1": "Mở Cài đặt",
+      "step2": "Chọn Trợ năng",
+      "step3": "Chọn Chuyển động",
+      "step4": "Bật Vehicle Motion Cues",
+      "openSettings": "Mở Cài đặt Trợ năng"
+    },
+    "onboarding": {
+      "getStarted": "Bắt đầu",
+      "next": "Tiếp theo",
+      "skip": "Bỏ qua"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "dotSize": "Kích thước chấm",
+    "dotSizeSmall": "Nhỏ",
+    "dotSizeMedium": "Vừa",
+    "dotSizeLarge": "Lớn",
+    "dotOpacity": "Độ mờ",
+    "sensitivity": "Độ nhạy",
+    "sensitivityLow": "Thấp",
+    "sensitivityMedium": "Vừa",
+    "sensitivityHigh": "Cao",
+    "about": "Giới thiệu",
+    "aboutDescription": "Serene kết hợp liệu pháp âm thanh 100 Hz và overlay motion cues để giúp giảm triệu chứng say xe khi di chuyển.",
+    "research": "Dựa trên nghiên cứu từ Đại học Nagoya, Nhật Bản",
+    "version": "Phiên bản",
+    "language": "Ngôn ngữ"
+  }
+}

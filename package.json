@@ -1,22 +1,42 @@
 {
-  "name": "serene-init",
+  "name": "serene",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "prebuild": "expo prebuild",
+    "lint": "expo lint"
   },
   "dependencies": {
+    "@expo-google-fonts/manrope": "^0.4.2",
+    "@react-native-async-storage/async-storage": "^3.0.2",
     "expo": "~54.0.33",
+    "expo-constants": "^55.0.11",
+    "expo-font": "^55.0.6",
+    "expo-linking": "^55.0.11",
+    "expo-localization": "^55.0.11",
+    "expo-router": "^55.0.10",
+    "expo-sensors": "^55.0.11",
+    "expo-splash-screen": "^55.0.15",
     "expo-status-bar": "~3.0.9",
+    "expo-system-ui": "^55.0.13",
+    "i18next": "^26.0.3",
     "react": "19.1.0",
-    "react-native": "0.81.5"
+    "react-i18next": "^17.0.2",
+    "react-native": "0.81.5",
+    "react-native-gesture-handler": "^2.31.0",
+    "react-native-reanimated": "^4.3.0",
+    "react-native-safe-area-context": "^5.7.0",
+    "react-native-screens": "^4.24.0",
+    "react-native-webview": "^13.16.1"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc"
 }
