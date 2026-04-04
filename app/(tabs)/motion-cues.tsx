@@ -3,16 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   ScrollView,
   Platform,
   Linking,
   Switch,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
-import * as Device from "expo-device";
 import {
   colors,
   fonts,
@@ -20,14 +16,19 @@ import {
   spacing,
   borderRadius,
   shadows,
+  letterSpacing,
+  lineHeights,
 } from "@/constants/theme";
 import { Button } from "@/components/Button";
+import { Header } from "@/components/Header";
 import {
   OnboardingSlides,
   type Slide,
 } from "@/components/OnboardingSlides";
 import { DemoPhoneMockup } from "@/components/DemoPhoneMockup";
 import { useMotionCues } from "@/hooks/useMotionCues";
+
+const TAB_BAR_CLEARANCE = 120;
 
 // ============================================================
 // Android Onboarding Slides
@@ -334,7 +335,10 @@ function IOSControlScreen({
     toggleIOSOverlay,
   } = useMotionCues();
 
-  const iosMajor = parseInt(Device.osVersion ?? "0", 10);
+  const iosMajor =
+    Platform.OS === "ios"
+      ? parseInt(String(Platform.Version).split(".")[0] ?? "0", 10)
+      : 0;
   const isUnsupported = Platform.OS === "ios" && iosMajor < 18;
 
   return (
@@ -406,8 +410,6 @@ function IOSControlScreen({
 // ============================================================
 
 export default function MotionCuesScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const {
     isFirstTime,
@@ -508,29 +510,24 @@ export default function MotionCuesScreen() {
           ];
 
     return (
-      <View style={[styles.container, { paddingTop: insets.top + spacing.md }]}>
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={16}
-          style={styles.backRow}
-        >
-          <Text style={styles.backButton}>{t("common.back")}</Text>
-        </Pressable>
+      <View style={styles.container}>
+        <Header
+          eyebrow={t("motionCues.eyebrow")}
+          title={t("motionCues.title")}
+          compact
+        />
         <OnboardingSlides slides={slides} />
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + spacing.md }]}>
-      <Pressable
-        onPress={() => router.back()}
-        hitSlop={16}
-        style={styles.backRow}
-      >
-        <Text style={styles.backButton}>{t("common.back")}</Text>
-      </Pressable>
-      <Text style={styles.title}>{t("motionCues.title")}</Text>
+    <View style={styles.container}>
+      <Header
+        eyebrow={t("motionCues.eyebrow")}
+        title={t("motionCues.title")}
+        description={t("motionCues.howItWorks")}
+      />
 
       {Platform.OS === "android" ? (
         <AndroidControlScreen onReviewGuide={handleReview} />
@@ -549,23 +546,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  backRow: {
-    paddingHorizontal: spacing.lg,
-  },
-  backButton: {
-    fontFamily: fonts.medium,
-    fontSize: fontSizes.md,
-    color: colors.primary,
-    paddingVertical: spacing.sm,
-  },
-  title: {
-    fontFamily: fonts.bold,
-    fontSize: fontSizes["3xl"],
-    color: colors.textPrimary,
-    paddingHorizontal: spacing.lg,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
   },
 });
 
@@ -614,7 +594,7 @@ const slideStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.md,
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
@@ -645,7 +625,7 @@ const slideStyles = StyleSheet.create({
     fontStyle: "italic",
   },
   permissionCard: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     padding: spacing.lg,
     borderRadius: borderRadius.lg,
     borderLeftWidth: 4,
@@ -712,12 +692,12 @@ const slideStyles = StyleSheet.create({
 
 const controlStyles = StyleSheet.create({
   scroll: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing["2xl"],
+    paddingHorizontal: spacing.xl,
+    paddingBottom: TAB_BAR_CLEARANCE,
     gap: spacing.md,
   },
   statusCard: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     padding: spacing.lg,
     borderRadius: borderRadius.lg,
     ...shadows.sm,
@@ -776,7 +756,7 @@ const controlStyles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
   },
   card: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     padding: spacing.lg,
     borderRadius: borderRadius.lg,
     gap: spacing.sm,

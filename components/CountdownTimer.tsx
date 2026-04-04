@@ -2,75 +2,141 @@ import { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
-  useAnimatedProps,
+  useAnimatedStyle,
   withTiming,
+  withRepeat,
+  withSequence,
   Easing,
+  interpolate,
+  interpolateColor,
 } from "react-native-reanimated";
-import Svg, { Circle } from "react-native-svg";
-import { colors, fonts, fontSizes } from "@/constants/theme";
-
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+import {
+  colors,
+  fonts,
+  fontSizes,
+  letterSpacing,
+  lineHeights,
+  motion,
+} from "@/constants/theme";
 
 type CountdownTimerProps = {
   remainingSeconds: number;
   totalSeconds: number;
+  isActive: boolean;
   size?: number;
-  strokeWidth?: number;
 };
 
+/**
+ * Breathing sine wave timer — pulsing concentric circles.
+ * Instead of a ticking progress ring, the timer breathes in and out,
+ * creating a calming, meditative feel that matches the "weighted blanket" concept.
+ */
 export function CountdownTimer({
   remainingSeconds,
   totalSeconds,
-  size = 220,
-  strokeWidth = 10,
+  isActive,
+  size = 260,
 }: CountdownTimerProps) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const progress = useSharedValue(1);
+  const breath = useSharedValue(0);
+  const glow = useSharedValue(isActive ? 1 : 0);
 
   useEffect(() => {
-    const ratio = Math.max(0, Math.min(1, remainingSeconds / totalSeconds));
-    progress.value = withTiming(ratio, {
-      duration: 200,
-      easing: Easing.out(Easing.quad),
-    });
-  }, [remainingSeconds, totalSeconds, progress]);
+    // Continuous breathing animation — 4s in, 4s out
+    breath.value = withRepeat(
+      withSequence(
+        withTiming(1, {
+          duration: motion.breath,
+          easing: Easing.inOut(Easing.sin),
+        }),
+        withTiming(0, {
+          duration: motion.breath,
+          easing: Easing.inOut(Easing.sin),
+        })
+      ),
+      -1,
+      false
+    );
+  }, [breath]);
 
-  const animatedProps = useAnimatedProps(() => ({
-    strokeDashoffset: circumference * (1 - progress.value),
+  useEffect(() => {
+    glow.value = withTiming(isActive ? 1 : 0, {
+      duration: motion.slow,
+    });
+  }, [isActive, glow]);
+
+  const outerRing = useAnimatedStyle(() => ({
+    transform: [
+      { scale: interpolate(breath.value, [0, 1], [0.96, 1.04]) },
+    ],
+    opacity: interpolate(breath.value, [0, 1], [0.25, 0.55]) * (0.5 + glow.value * 0.5),
+  }));
+
+  const middleRing = useAnimatedStyle(() => ({
+    transform: [
+      { scale: interpolate(breath.value, [0, 1], [0.92, 1.0]) },
+    ],
+    opacity: interpolate(breath.value, [0, 1], [0.4, 0.75]) * (0.5 + glow.value * 0.5),
+  }));
+
+  const innerCore = useAnimatedStyle(() => ({
+    transform: [
+      { scale: interpolate(breath.value, [0, 1], [0.88, 0.96]) },
+    ],
+    backgroundColor: interpolateColor(
+      glow.value,
+      [0, 1],
+      [colors.surfaceTinted, colors.primarySoft]
+    ),
   }));
 
   const displaySeconds = Math.ceil(remainingSeconds);
+  const progress = totalSeconds > 0 ? 1 - remainingSeconds / totalSeconds : 0;
+  const progressPercent = Math.round(progress * 100);
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
-      <Svg width={size} height={size}>
-        {/* Background circle */}
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={colors.neutralDark}
-          strokeWidth={strokeWidth}
-          fill="transparent"
-        />
-        {/* Progress circle */}
-        <AnimatedCircle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          stroke={colors.primary}
-          strokeWidth={strokeWidth}
-          fill="transparent"
-          strokeDasharray={circumference}
-          animatedProps={animatedProps}
-          strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        />
-      </Svg>
-      <View style={styles.label}>
+      {/* Outer breathing ring */}
+      <Animated.View
+        style={[
+          styles.ring,
+          styles.outerRing,
+          { width: size, height: size, borderRadius: size / 2 },
+          outerRing,
+        ]}
+      />
+      {/* Middle breathing ring */}
+      <Animated.View
+        style={[
+          styles.ring,
+          styles.middleRing,
+          {
+            width: size * 0.82,
+            height: size * 0.82,
+            borderRadius: (size * 0.82) / 2,
+          },
+          middleRing,
+        ]}
+      />
+      {/* Inner core */}
+      <Animated.View
+        style={[
+          styles.core,
+          {
+            width: size * 0.66,
+            height: size * 0.66,
+            borderRadius: (size * 0.66) / 2,
+          },
+          innerCore,
+        ]}
+      />
+
+      {/* Center content */}
+      <View style={styles.center}>
         <Text style={styles.seconds}>{displaySeconds}</Text>
         <Text style={styles.unit}>seconds</Text>
+        {isActive && (
+          <Text style={styles.progress}>{progressPercent}%</Text>
+        )}
       </View>
     </View>
   );
@@ -81,21 +147,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  label: {
+  ring: {
     position: "absolute",
+    borderWidth: 1,
+    borderColor: colors.primary,
+    backgroundColor: "transparent",
+  },
+  outerRing: {
+    borderWidth: 0.5,
+  },
+  middleRing: {
+    borderWidth: 1,
+  },
+  core: {
+    position: "absolute",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+  },
+  center: {
     alignItems: "center",
     justifyContent: "center",
   },
   seconds: {
-    fontFamily: fonts.bold,
-    fontSize: fontSizes["4xl"] + 16,
+    fontFamily: fonts.extraBold,
+    fontSize: 72,
     color: colors.textPrimary,
-    lineHeight: fontSizes["4xl"] + 20,
+    lineHeight: 72 * lineHeights.tight,
+    letterSpacing: letterSpacing.tight,
   },
   unit: {
     fontFamily: fonts.medium,
     fontSize: fontSizes.sm,
-    color: colors.textSecondary,
+    color: colors.textTertiary,
+    letterSpacing: letterSpacing.wide,
     textTransform: "lowercase",
+    marginTop: -4,
+  },
+  progress: {
+    fontFamily: fonts.semiBold,
+    fontSize: fontSizes.xs,
+    color: colors.primary,
+    marginTop: 8,
+    letterSpacing: letterSpacing.wide,
   },
 });

@@ -1,4 +1,9 @@
 {
+  "tabs": {
+    "home": "Home",
+    "motion": "Motion",
+    "settings": "Settings"
+  },
   "common": {
     "appName": "Serene",
     "tagline": "Calm every journey",
@@ -16,30 +21,41 @@
     "getStarted": "Get Started"
   },
   "home": {
-    "listen100Hz": "Listen 100 Hz",
-    "listenDescription": "60-second audio therapy to help reduce motion sickness",
+    "greeting": "Welcome to",
+    "audioEyebrow": "Audio Therapy",
+    "motionEyebrow": "Visual Grounding",
+    "listen100Hz": "100 Hz Session",
+    "listenDescription": "60 seconds of therapeutic tone to calm the vestibular system before your journey.",
     "motionCues": "Motion Cues",
-    "motionCuesDescription": "Visual dots that move with your vehicle",
-    "overlayActive": "Overlay active",
-    "overlayInactive": "Overlay off"
+    "motionCuesDescription": "Eight breathing dots at the screen edges follow your vehicle's motion — reconciling sight and sense.",
+    "startSession": "Start session",
+    "activateOverlay": "Activate overlay",
+    "manageOverlay": "Manage overlay",
+    "researchNote": "Based on research from Nagoya University (2025) and Apple's Vehicle Motion Cues."
   },
   "audio": {
+    "eyebrow": "100 Hz Therapy",
     "title": "Audio Therapy",
-    "volumeGuide": "Put on headphones and set volume to a comfortable level",
-    "volumeTip": "The sound should be clearly audible but not uncomfortable",
+    "volumeGuide": "Put on headphones and set volume to a comfortable level.",
+    "volumeTip": "The sound should be clearly audible but never uncomfortable.",
+    "headphoneBadge": "Headphones required",
     "startListening": "Start Listening",
     "countdown": "{{seconds}}s remaining",
-    "listening": "Listening..."
+    "listening": "Now playing"
   },
   "done": {
-    "title": "All Done!",
-    "message": "The 100 Hz therapy session is complete",
-    "effectDuration": "Effects may last up to ~2 hours",
-    "listenAgain": "Listen Again",
+    "eyebrow": "Session Complete",
+    "title": "All Done",
+    "message": "Your 100 Hz session is complete. Take a breath and start your journey.",
+    "durationLabel": "Estimated effect",
+    "effectDuration": "Up to 2 hours",
+    "listenAgain": "Listen again",
     "enableMotionCues": "Enable Motion Cues",
+    "backHome": "Back to home",
     "disclaimer": "Results may vary by individual. Based on research from Nagoya University."
   },
   "motionCues": {
+    "eyebrow": "Visual Grounding",
     "title": "Motion Cues",
     "howItWorks": "8 subtle dots on your screen edges move with your vehicle's motion, helping your brain reconcile what your eyes see with what your body feels.",
     "reviewGuide": "Review the guide",
@@ -104,6 +120,8 @@
     }
   },
   "settings": {
+    "eyebrow": "Preferences",
+    "description": "Fine-tune your Serene experience.",
     "title": "Settings",
     "dotSize": "Dot Size",
     "dotSizeSmall": "Small",

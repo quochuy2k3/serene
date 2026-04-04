@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Platform } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
   useFonts,
@@ -22,8 +22,20 @@ import { colors } from "@/constants/theme";
 SplashScreen.preventAutoHideAsync();
 
 function IOSOverlay() {
-  const { iosOverlayEnabled } = useMotionCues();
+  const { iosOverlayEnabled, isFirstTime } = useMotionCues();
+  const pathname = usePathname();
+
   if (Platform.OS !== "ios") return null;
+
+  // Hide overlay on motion-cues/settings screens (would overlap controls)
+  // and during first-time onboarding (would overlap slides).
+  const hideOnScreen =
+    pathname.includes("motion-cues") ||
+    pathname.includes("settings") ||
+    isFirstTime === true;
+
+  if (hideOnScreen) return null;
+
   return <MotionDotsOverlay visible={iosOverlayEnabled} />;
 }
 
@@ -62,7 +74,23 @@ export default function RootLayout() {
               headerShown: false,
               contentStyle: { backgroundColor: colors.background },
             }}
-          />
+          >
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+              name="audio"
+              options={{
+                presentation: "modal",
+                animation: "fade_from_bottom",
+              }}
+            />
+            <Stack.Screen
+              name="done"
+              options={{
+                presentation: "modal",
+                animation: "fade",
+              }}
+            />
+          </Stack>
           <IOSOverlay />
         </SettingsProvider>
       </SafeAreaProvider>

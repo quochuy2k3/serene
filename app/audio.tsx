@@ -1,11 +1,20 @@
 import { useEffect } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
-import { colors, fonts, fontSizes, spacing } from "@/constants/theme";
+import {
+  colors,
+  fonts,
+  fontSizes,
+  spacing,
+  letterSpacing,
+  lineHeights,
+  borderRadius,
+} from "@/constants/theme";
 import { AUDIO_CONFIG } from "@/constants/config";
 import { Button } from "@/components/Button";
+import { Header } from "@/components/Header";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { useAudioSession } from "@/hooks/useAudioSession";
 
@@ -19,7 +28,7 @@ export default function AudioScreen() {
     if (state === "completed") {
       const timeout = setTimeout(() => {
         router.replace("/done");
-      }, 400);
+      }, 500);
       return () => clearTimeout(timeout);
     }
   }, [state, router]);
@@ -28,29 +37,52 @@ export default function AudioScreen() {
   const isPlaying = state === "playing";
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + spacing.lg }]}>
-      <Pressable onPress={() => router.back()} hitSlop={16}>
-        <Text style={styles.backButton}>{t("common.back")}</Text>
-      </Pressable>
+    <View style={styles.container}>
+      <Header
+        eyebrow={t("audio.eyebrow")}
+        title={t("audio.title")}
+        showBack
+        compact
+      />
 
       <View style={styles.content}>
-        <Text style={styles.title}>{t("audio.title")}</Text>
-
-        {isIdle && (
-          <View style={styles.guideBox}>
-            <Text style={styles.guide}>{t("audio.volumeGuide")}</Text>
-            <Text style={styles.tip}>{t("audio.volumeTip")}</Text>
-          </View>
-        )}
-
         <View style={styles.timerArea}>
           <CountdownTimer
             remainingSeconds={remainingSeconds}
             totalSeconds={AUDIO_CONFIG.duration}
+            isActive={isPlaying}
           />
         </View>
 
-        <View style={styles.actions}>
+        <View style={styles.guideArea}>
+          {isIdle && (
+            <View style={styles.guideBox}>
+              <View style={styles.guideHeader}>
+                <View style={styles.headphoneBadge}>
+                  <Text style={styles.headphoneBadgeText}>
+                    {t("audio.headphoneBadge")}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.guideTitle}>{t("audio.volumeGuide")}</Text>
+              <Text style={styles.guideTip}>{t("audio.volumeTip")}</Text>
+            </View>
+          )}
+
+          {isPlaying && (
+            <View style={styles.playingBox}>
+              <View style={styles.pulseDot} />
+              <Text style={styles.playingText}>{t("audio.listening")}</Text>
+            </View>
+          )}
+        </View>
+
+        <View
+          style={[
+            styles.actions,
+            { paddingBottom: insets.bottom + spacing.lg },
+          ]}
+        >
           {isIdle && (
             <Button
               label={t("audio.startListening")}
@@ -60,16 +92,13 @@ export default function AudioScreen() {
             />
           )}
           {isPlaying && (
-            <>
-              <Text style={styles.listening}>{t("audio.listening")}</Text>
-              <Button
-                label={t("common.stop")}
-                onPress={stop}
-                variant="outlined"
-                size="md"
-                fullWidth
-              />
-            </>
+            <Button
+              label={t("common.stop")}
+              onPress={stop}
+              variant="outlined"
+              size="md"
+              fullWidth
+            />
           )}
         </View>
       </View>
@@ -81,57 +110,78 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingHorizontal: spacing.lg,
-  },
-  backButton: {
-    fontFamily: fonts.medium,
-    fontSize: fontSizes.md,
-    color: colors.primary,
-    paddingVertical: spacing.sm,
   },
   content: {
     flex: 1,
-    paddingBottom: spacing["2xl"],
-  },
-  title: {
-    fontFamily: fonts.bold,
-    fontSize: fontSizes["3xl"],
-    color: colors.textPrimary,
-    marginTop: spacing.md,
-    marginBottom: spacing.lg,
-    textAlign: "center",
-  },
-  guideBox: {
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  guide: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.md,
-    color: colors.textPrimary,
-    textAlign: "center",
-    marginBottom: spacing.xs,
-    lineHeight: 22,
-  },
-  tip: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    textAlign: "center",
+    paddingHorizontal: spacing.xl,
   },
   timerArea: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: spacing.xl,
+  },
+  guideArea: {
+    minHeight: 120,
+    justifyContent: "center",
+    marginBottom: spacing.lg,
+  },
+  guideBox: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.md,
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  guideHeader: {
+    flexDirection: "row",
+    marginBottom: spacing.xs,
+  },
+  headphoneBadge: {
+    backgroundColor: colors.primarySoft,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: borderRadius.sm,
+  },
+  headphoneBadgeText: {
+    fontFamily: fonts.bold,
+    fontSize: fontSizes.xs,
+    color: colors.primary,
+    letterSpacing: letterSpacing.wide + 0.5,
+    textTransform: "uppercase",
+  },
+  guideTitle: {
+    fontFamily: fonts.semiBold,
+    fontSize: fontSizes.md,
+    color: colors.textPrimary,
+    lineHeight: fontSizes.md * lineHeights.normal,
+  },
+  guideTip: {
+    fontFamily: fonts.regular,
+    fontSize: fontSizes.sm,
+    color: colors.textSecondary,
+    lineHeight: fontSizes.sm * lineHeights.normal,
+  },
+  playingBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+  },
+  pulseDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.primary,
+  },
+  playingText: {
+    fontFamily: fonts.semiBold,
+    fontSize: fontSizes.sm,
+    color: colors.textSecondary,
+    letterSpacing: letterSpacing.wide,
+    textTransform: "uppercase",
   },
   actions: {
-    gap: spacing.md,
-    alignItems: "center",
-  },
-  listening: {
-    fontFamily: fonts.medium,
-    fontSize: fontSizes.md,
-    color: colors.primary,
-    marginBottom: spacing.xs,
+    paddingTop: spacing.lg,
   },
 });
