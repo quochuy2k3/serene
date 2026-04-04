@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Platform } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -14,9 +15,17 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { i18nPromise } from "@/i18n";
 import { SettingsProvider } from "@/hooks/useSettings";
+import { MotionDotsOverlay } from "@/components/MotionDotsOverlay";
+import { useMotionCues } from "@/hooks/useMotionCues";
 import { colors } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
+
+function IOSOverlay() {
+  const { iosOverlayEnabled } = useMotionCues();
+  if (Platform.OS !== "ios") return null;
+  return <MotionDotsOverlay visible={iosOverlayEnabled} />;
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -54,6 +63,7 @@ export default function RootLayout() {
               contentStyle: { backgroundColor: colors.background },
             }}
           />
+          <IOSOverlay />
         </SettingsProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

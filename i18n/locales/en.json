@@ -5,18 +5,23 @@
     "start": "Start",
     "stop": "Stop",
     "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "skip": "Skip",
     "settings": "Settings",
     "on": "On",
     "off": "Off",
     "enable": "Enable",
-    "disable": "Disable"
+    "disable": "Disable",
+    "getStarted": "Get Started"
   },
   "home": {
     "listen100Hz": "Listen 100 Hz",
     "listenDescription": "60-second audio therapy to help reduce motion sickness",
     "motionCues": "Motion Cues",
     "motionCuesDescription": "Visual dots that move with your vehicle",
-    "overlayStatus": "Overlay: {{status}}"
+    "overlayActive": "Overlay active",
+    "overlayInactive": "Overlay off"
   },
   "audio": {
     "title": "Audio Therapy",
@@ -36,30 +41,66 @@
   },
   "motionCues": {
     "title": "Motion Cues",
-    "status": "Status",
     "howItWorks": "8 subtle dots on your screen edges move with your vehicle's motion, helping your brain reconcile what your eyes see with what your body feels.",
+    "reviewGuide": "Review the guide",
     "android": {
-      "permissionRequired": "Overlay permission required",
-      "permissionDescription": "Serene needs permission to display dots over other apps",
-      "grantPermission": "Grant Permission",
-      "startOverlay": "Start Overlay",
-      "stopOverlay": "Stop Overlay",
-      "overlayActive": "Overlay is active — works across all apps"
+      "onboarding": {
+        "slide1Title": "Dots that follow your vehicle",
+        "slide1Caption": "When your car turns, accelerates, or brakes, the dots move accordingly — helping your brain synchronize vision with motion.",
+        "slide1CaptionTurning": "Turning right...",
+        "slide1CaptionAccelerating": "Accelerating...",
+        "slide1CaptionBraking": "Braking...",
+        "slide2Title": "Why it works",
+        "slide2Eye": "Eyes see dots move",
+        "slide2Ear": "Inner ear senses motion",
+        "slide2Brain": "Brain syncs → no conflict",
+        "slide2Source": "Based on research from Apple and Nagoya University",
+        "slide3Title": "One permission needed",
+        "slide3Feature": "Display over other apps",
+        "slide3Reason": "So the dots appear when you use TikTok, YouTube, or any other app",
+        "slide3Privacy": "Serene never reads the content of your screen.",
+        "slide3Grant": "Grant Permission",
+        "slide3Later": "Skip, I'll do it later"
+      },
+      "control": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "activeDescription": "Dots are showing on all apps",
+        "inactiveDescription": "Overlay is currently off",
+        "startOverlay": "Start Overlay",
+        "stopOverlay": "Stop Overlay",
+        "permissionRequired": "Overlay permission required",
+        "permissionDescription": "Serene needs permission to display dots over other apps",
+        "grantPermission": "Grant Permission"
+      }
     },
     "ios": {
-      "inAppOverlay": "In-App Overlay",
-      "appleGuide": "Apple Vehicle Motion Cues",
-      "guideIntro": "iOS has a built-in feature that works system-wide. Follow these steps to enable it:",
-      "step1": "Open Settings",
-      "step2": "Tap Accessibility",
-      "step3": "Tap Motion",
-      "step4": "Enable Vehicle Motion Cues",
-      "openSettings": "Open Accessibility Settings"
-    },
-    "onboarding": {
-      "getStarted": "Get Started",
-      "next": "Next",
-      "skip": "Skip"
+      "onboarding": {
+        "slide1Title": "Your iPhone already has this feature",
+        "slide1Subtitle": "Apple calls it Vehicle Motion Cues — available on iOS 18 and later.",
+        "slide1Description": "We'll walk you through enabling it in seconds.",
+        "slide1Cta": "Start",
+        "slide2Title": "Follow these 4 steps",
+        "slide2Step1": "Open Settings",
+        "slide2Step2": "Tap Accessibility",
+        "slide2Step3": "Tap Motion",
+        "slide2Step4": "Enable Vehicle Motion Cues",
+        "slide2Cta": "Open Settings",
+        "slide2Tip": "Tip: You can also add it to Control Center for quick toggling.",
+        "slide3Title": "Ready to enable?",
+        "slide3Subtitle": "We'll open the Accessibility settings directly for you.",
+        "slide3Cta": "Open Settings Now",
+        "slide3Confirm": "I've enabled it"
+      },
+      "control": {
+        "appleCues": "Apple Vehicle Motion Cues",
+        "appleCuesEnabled": "Enabled",
+        "appleCuesDescription": "Works across all apps, even when Serene is closed",
+        "openSettings": "Open Settings",
+        "inAppOverlay": "In-App Overlay",
+        "inAppDescription": "Show dots while using Serene (foreground only)",
+        "unsupportedVersion": "This feature requires iOS 18 or later. Please update your iPhone."
+      }
     }
   },
   "settings": {

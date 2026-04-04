@@ -5,18 +5,23 @@
     "start": "Bắt đầu",
     "stop": "Dừng",
     "back": "Quay lại",
+    "next": "Tiếp theo",
+    "done": "Xong",
+    "skip": "Bỏ qua",
     "settings": "Cài đặt",
     "on": "Bật",
     "off": "Tắt",
     "enable": "Bật",
-    "disable": "Tắt"
+    "disable": "Tắt",
+    "getStarted": "Bắt đầu"
   },
   "home": {
     "listen100Hz": "Nghe 100 Hz",
     "listenDescription": "Liệu pháp âm thanh 60 giây giúp giảm say xe",
     "motionCues": "Motion Cues",
     "motionCuesDescription": "Các chấm tròn di chuyển theo xe của bạn",
-    "overlayStatus": "Overlay: {{status}}"
+    "overlayActive": "Overlay đang bật",
+    "overlayInactive": "Overlay đang tắt"
   },
   "audio": {
     "title": "Liệu pháp âm thanh",
@@ -36,30 +41,66 @@
   },
   "motionCues": {
     "title": "Motion Cues",
-    "status": "Trạng thái",
     "howItWorks": "8 chấm tròn nhỏ ở viền màn hình di chuyển theo chuyển động xe, giúp não bộ đồng bộ những gì mắt nhìn thấy với cảm nhận của cơ thể.",
+    "reviewGuide": "Xem lại hướng dẫn",
     "android": {
-      "permissionRequired": "Cần quyền hiển thị overlay",
-      "permissionDescription": "Serene cần quyền hiển thị chấm tròn trên các ứng dụng khác",
-      "grantPermission": "Cấp quyền",
-      "startOverlay": "Bật Overlay",
-      "stopOverlay": "Tắt Overlay",
-      "overlayActive": "Overlay đang hoạt động — hiển thị trên mọi ứng dụng"
+      "onboarding": {
+        "slide1Title": "Dots theo chuyển động xe",
+        "slide1Caption": "Khi xe rẽ, tăng tốc hay phanh, các dots dịch chuyển theo — giúp não đồng bộ thị giác với chuyển động.",
+        "slide1CaptionTurning": "Xe rẽ phải...",
+        "slide1CaptionAccelerating": "Tăng tốc...",
+        "slide1CaptionBraking": "Phanh...",
+        "slide2Title": "Tại sao nó hoạt động?",
+        "slide2Eye": "Mắt thấy dots di chuyển",
+        "slide2Ear": "Tai trong cảm nhận xe",
+        "slide2Brain": "Não đồng bộ → hết xung đột",
+        "slide2Source": "Dựa trên nghiên cứu của Apple và Đại học Nagoya",
+        "slide3Title": "Cần 1 quyền để hoạt động",
+        "slide3Feature": "Hiển thị trên các app khác",
+        "slide3Reason": "Để dots xuất hiện khi bạn dùng TikTok, YouTube hay bất kỳ app nào khác",
+        "slide3Privacy": "Serene không đọc nội dung màn hình của bạn.",
+        "slide3Grant": "Cấp quyền",
+        "slide3Later": "Bỏ qua, làm sau"
+      },
+      "control": {
+        "active": "Đang hoạt động",
+        "inactive": "Đang tắt",
+        "activeDescription": "Dots đang hiển thị trên mọi app",
+        "inactiveDescription": "Overlay đang tắt",
+        "startOverlay": "Bật Overlay",
+        "stopOverlay": "Tắt Overlay",
+        "permissionRequired": "Cần quyền hiển thị overlay",
+        "permissionDescription": "Serene cần quyền hiển thị chấm tròn trên các ứng dụng khác",
+        "grantPermission": "Cấp quyền"
+      }
     },
     "ios": {
-      "inAppOverlay": "Overlay trong ứng dụng",
-      "appleGuide": "Vehicle Motion Cues của Apple",
-      "guideIntro": "iOS có tính năng tích hợp hoạt động trên toàn hệ thống. Làm theo các bước sau để bật:",
-      "step1": "Mở Cài đặt",
-      "step2": "Chọn Trợ năng",
-      "step3": "Chọn Chuyển động",
-      "step4": "Bật Vehicle Motion Cues",
-      "openSettings": "Mở Cài đặt Trợ năng"
-    },
-    "onboarding": {
-      "getStarted": "Bắt đầu",
-      "next": "Tiếp theo",
-      "skip": "Bỏ qua"
+      "onboarding": {
+        "slide1Title": "iPhone của bạn đã có tính năng này rồi!",
+        "slide1Subtitle": "Apple gọi nó là Vehicle Motion Cues — có trong iOS 18 trở lên.",
+        "slide1Description": "Chúng tôi sẽ hướng dẫn bạn bật nó trong vài giây.",
+        "slide1Cta": "Bắt đầu",
+        "slide2Title": "Làm theo 4 bước sau",
+        "slide2Step1": "Mở Cài đặt",
+        "slide2Step2": "Chọn Trợ năng",
+        "slide2Step3": "Chọn Chuyển động",
+        "slide2Step4": "Bật Vehicle Motion Cues",
+        "slide2Cta": "Mở Cài đặt",
+        "slide2Tip": "Mẹo: Bạn có thể thêm vào Control Center để bật/tắt nhanh.",
+        "slide3Title": "Sẵn sàng bật chưa?",
+        "slide3Subtitle": "Chúng tôi sẽ mở thẳng trang Trợ năng trong Cài đặt cho bạn.",
+        "slide3Cta": "Mở Cài đặt ngay",
+        "slide3Confirm": "Tôi đã bật"
+      },
+      "control": {
+        "appleCues": "Apple Vehicle Motion Cues",
+        "appleCuesEnabled": "Đã bật",
+        "appleCuesDescription": "Hoạt động trên mọi app, kể cả khi Serene đã tắt",
+        "openSettings": "Mở Cài đặt",
+        "inAppOverlay": "Overlay trong ứng dụng",
+        "inAppDescription": "Hiển thị dots khi dùng Serene (chỉ khi app đang mở)",
+        "unsupportedVersion": "Tính năng này yêu cầu iOS 18 trở lên. Vui lòng cập nhật iPhone."
+      }
     }
   },
   "settings": {

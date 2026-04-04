@@ -30,7 +30,8 @@
       "expo-localization",
       "expo-sensors",
       "expo-audio",
-      "expo-font"
+      "expo-font",
+      "./plugins/withMotionCuesModule.js"
     ]
   }
 }
