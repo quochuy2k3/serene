@@ -9,8 +9,8 @@ Free, non-profit app for iOS + Android. Package: `com.serene.app`.
 
 ## Tech Stack
 
-- **Framework:** Expo SDK 55 (bare workflow) + TypeScript
-- **Navigation:** Expo Router v4 (file-based, `app/` directory)
+- **Framework:** Expo SDK 54 (bare workflow) + TypeScript
+- **Navigation:** Expo Router v6 (file-based, `app/` directory)
 - **Package manager:** pnpm
 - **i18n:** i18next + react-i18next + expo-localization (VI + EN)
 - **Fonts:** Manrope (via @expo-google-fonts/manrope)
