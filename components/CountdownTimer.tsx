@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -37,6 +38,7 @@ export function CountdownTimer({
   isActive,
   size = 260,
 }: CountdownTimerProps) {
+  const { t } = useTranslation();
   const breath = useSharedValue(0);
   const glow = useSharedValue(isActive ? 1 : 0);
 
@@ -133,7 +135,7 @@ export function CountdownTimer({
       {/* Center content */}
       <View style={styles.center}>
         <Text style={styles.seconds}>{displaySeconds}</Text>
-        <Text style={styles.unit}>seconds</Text>
+        <Text style={styles.unit}>{t("audio.secondsUnit")}</Text>
         {isActive && (
           <Text style={styles.progress}>{progressPercent}%</Text>
         )}

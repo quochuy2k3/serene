@@ -26,13 +26,13 @@ import {
   useScreenEntrance,
   useStaggeredEntrance,
 } from "@/hooks/useScreenEntrance";
-
-const TAB_BAR_CLEARANCE = 120;
+import { useTabBarClearance } from "@/hooks/useTabBarClearance";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const { settings, updateSettings } = useSettings();
   const haptics = useHaptics();
+  const tabBarClearance = useTabBarClearance();
 
   const headerEntrance = useScreenEntrance(0);
   const section1Entrance = useStaggeredEntrance(1);
@@ -75,7 +75,10 @@ export default function SettingsScreen() {
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: tabBarClearance },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Dot Size */}
@@ -204,7 +207,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: TAB_BAR_CLEARANCE,
     gap: spacing.xl,
   },
   section: {

@@ -9,6 +9,7 @@ import {
   type NativeScrollEvent,
 } from "react-native";
 import { colors, fonts, fontSizes, spacing } from "@/constants/theme";
+import { useTabBarClearance } from "@/hooks/useTabBarClearance";
 import { Button } from "./Button";
 
 export type Slide = {
@@ -26,7 +27,6 @@ export type Slide = {
 
 type OnboardingSlidesProps = {
   slides: Slide[];
-  onComplete?: () => void;
   title?: string;
 };
 
@@ -35,6 +35,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 export function OnboardingSlides({ slides, title }: OnboardingSlidesProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+  const tabBarClearance = useTabBarClearance();
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const newIndex = Math.round(
@@ -82,7 +83,7 @@ export function OnboardingSlides({ slides, title }: OnboardingSlidesProps) {
         })}
       />
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: tabBarClearance }]}>
         <View style={styles.dots}>
           {slides.map((_, i) => (
             <View
@@ -106,11 +107,7 @@ export function OnboardingSlides({ slides, title }: OnboardingSlidesProps) {
             />
           )}
           <Button
-            label={
-              currentIndex < slides.length - 1
-                ? current.primaryCta.label
-                : current.primaryCta.label
-            }
+            label={current.primaryCta.label}
             onPress={
               currentIndex < slides.length - 1
                 ? goNext
@@ -145,7 +142,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingTop: spacing.md,
     gap: spacing.lg,
   },
   dots: {

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { StyleSheet, View, type ViewStyle } from "react-native";
 import { Accelerometer } from "expo-sensors";
+import { useSafeAreaInsets, type EdgeInsets } from "react-native-safe-area-context";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,17 +10,26 @@ import Animated, {
 import { MOTION_CUES_CONFIG } from "@/constants/config";
 import { useSettings } from "@/hooks/useSettings";
 
-// 8 dot positions at screen edges
-const DOT_POSITIONS: ViewStyle[] = [
-  { top: 20, left: "25%" },
-  { top: 20, right: "25%" },
-  { bottom: 40, left: "25%" },
-  { bottom: 40, right: "25%" },
-  { top: "25%", left: 12 },
-  { top: "70%", left: 12 },
-  { top: "25%", right: 12 },
-  { top: "70%", right: 12 },
-];
+/**
+ * 8 dot positions at the screen edges, offset by the safe-area insets so the
+ * top dots clear the status bar/notch and the bottom dots clear the home
+ * indicator while staying in the peripheral vision zone.
+ */
+function getDotPositions(insets: EdgeInsets): ViewStyle[] {
+  const top = insets.top + 12;
+  const bottom = insets.bottom + 24;
+  const side = 12;
+  return [
+    { top, left: "25%" },
+    { top, right: "25%" },
+    { bottom, left: "25%" },
+    { bottom, right: "25%" },
+    { top: "25%", left: side },
+    { top: "70%", left: side },
+    { top: "25%", right: side },
+    { top: "70%", right: side },
+  ];
+}
 
 type MotionDotProps = {
   position: ViewStyle;
@@ -83,16 +93,18 @@ type MotionDotsOverlayProps = {
 
 export function MotionDotsOverlay({ visible }: MotionDotsOverlayProps) {
   const { settings } = useSettings();
+  const insets = useSafeAreaInsets();
 
   if (!visible) return null;
 
   const size = MOTION_CUES_CONFIG.dotSizes[settings.dotSize];
   const sensitivity =
     MOTION_CUES_CONFIG.sensitivityMultipliers[settings.sensitivity];
+  const positions = getDotPositions(insets);
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      {DOT_POSITIONS.map((position, index) => (
+      {positions.map((position, index) => (
         <MotionDot
           key={index}
           position={position}

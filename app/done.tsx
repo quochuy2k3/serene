@@ -22,10 +22,7 @@ import {
 } from "@/constants/theme";
 import { Button } from "@/components/Button";
 import { useHaptics } from "@/hooks/useHaptics";
-import {
-  useScreenEntrance,
-  useStaggeredEntrance,
-} from "@/hooks/useScreenEntrance";
+import { useStaggeredEntrance } from "@/hooks/useScreenEntrance";
 
 export default function DoneScreen() {
   const router = useRouter();

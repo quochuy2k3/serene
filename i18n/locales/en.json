@@ -7,18 +7,11 @@
   "common": {
     "appName": "Serene",
     "tagline": "Calm every journey",
-    "start": "Start",
     "stop": "Stop",
-    "back": "Back",
     "next": "Next",
     "done": "Done",
-    "skip": "Skip",
-    "settings": "Settings",
     "on": "On",
-    "off": "Off",
-    "enable": "Enable",
-    "disable": "Disable",
-    "getStarted": "Get Started"
+    "off": "Off"
   },
   "home": {
     "greeting": "Welcome to",
@@ -40,7 +33,7 @@
     "volumeTip": "The sound should be clearly audible but never uncomfortable.",
     "headphoneBadge": "Headphones required",
     "startListening": "Start Listening",
-    "countdown": "{{seconds}}s remaining",
+    "secondsUnit": "seconds",
     "listening": "Now playing"
   },
   "done": {
@@ -49,7 +42,6 @@
     "message": "Your 100 Hz session is complete. Take a breath and start your journey.",
     "durationLabel": "Estimated effect",
     "effectDuration": "Up to 2 hours",
-    "listenAgain": "Listen again",
     "enableMotionCues": "Enable Motion Cues",
     "backHome": "Back to home",
     "disclaimer": "Results may vary by individual. Based on research from Nagoya University."
@@ -63,9 +55,6 @@
       "onboarding": {
         "slide1Title": "Dots that follow your vehicle",
         "slide1Caption": "When your car turns, accelerates, or brakes, the dots move accordingly — helping your brain synchronize vision with motion.",
-        "slide1CaptionTurning": "Turning right...",
-        "slide1CaptionAccelerating": "Accelerating...",
-        "slide1CaptionBraking": "Braking...",
         "slide2Title": "Why it works",
         "slide2Eye": "Eyes see dots move",
         "slide2Ear": "Inner ear senses motion",

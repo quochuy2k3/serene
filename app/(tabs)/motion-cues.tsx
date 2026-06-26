@@ -17,20 +17,16 @@ import {
   spacing,
   borderRadius,
   shadows,
-  letterSpacing,
-  lineHeights,
 } from "@/constants/theme";
 import { Button } from "@/components/Button";
 import { Header } from "@/components/Header";
-import { PulsingDot } from "@/components/PulsingDot";
 import {
   OnboardingSlides,
   type Slide,
 } from "@/components/OnboardingSlides";
 import { DemoPhoneMockup } from "@/components/DemoPhoneMockup";
 import { useMotionCues } from "@/hooks/useMotionCues";
-
-const TAB_BAR_CLEARANCE = 120;
+import { useTabBarClearance } from "@/hooks/useTabBarClearance";
 
 // ============================================================
 // Android Onboarding Slides
@@ -266,6 +262,7 @@ function AndroidControlScreen({
   onReviewGuide: () => void;
 }) {
   const { t } = useTranslation();
+  const tabBarClearance = useTabBarClearance();
   const {
     hasPermission,
     isActive,
@@ -277,7 +274,10 @@ function AndroidControlScreen({
   return (
     <ScrollView
       style={{ flex: 1 }}
-      contentContainerStyle={controlStyles.scroll}
+      contentContainerStyle={[
+        controlStyles.scroll,
+        { paddingBottom: tabBarClearance },
+      ]}
     >
       <View
         style={[
@@ -369,6 +369,7 @@ function IOSControlScreen({
   onReviewGuide: () => void;
 }) {
   const { t } = useTranslation();
+  const tabBarClearance = useTabBarClearance();
   const {
     iosOverlayEnabled,
     iosAppleCuesConfirmed,
@@ -384,7 +385,10 @@ function IOSControlScreen({
   return (
     <ScrollView
       style={{ flex: 1 }}
-      contentContainerStyle={controlStyles.scroll}
+      contentContainerStyle={[
+        controlStyles.scroll,
+        { paddingBottom: tabBarClearance },
+      ]}
     >
       {isUnsupported && (
         <View style={controlStyles.warningCard}>
@@ -600,10 +604,6 @@ const slideStyles = StyleSheet.create({
     paddingVertical: spacing.md,
     gap: spacing.md,
   },
-  emoji: {
-    fontSize: 56,
-    marginBottom: spacing.sm,
-  },
   heading: {
     fontFamily: fonts.bold,
     fontSize: fontSizes["2xl"],
@@ -764,7 +764,6 @@ const slideStyles = StyleSheet.create({
 const controlStyles = StyleSheet.create({
   scroll: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: TAB_BAR_CLEARANCE,
     gap: spacing.md,
   },
   statusCard: {
@@ -799,7 +798,7 @@ const controlStyles = StyleSheet.create({
     color: colors.textSecondary,
   },
   warningCard: {
-    backgroundColor: "#FFF8E1",
+    backgroundColor: colors.warningSoft,
     padding: spacing.lg,
     borderRadius: borderRadius.md,
     gap: spacing.sm,
@@ -807,12 +806,12 @@ const controlStyles = StyleSheet.create({
   warningTitle: {
     fontFamily: fonts.semiBold,
     fontSize: fontSizes.md,
-    color: "#8D6E00",
+    color: colors.warning,
   },
   warningText: {
     fontFamily: fonts.regular,
     fontSize: fontSizes.sm,
-    color: "#8D6E00",
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   actionButton: {

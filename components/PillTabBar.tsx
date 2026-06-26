@@ -18,7 +18,6 @@ import { useHaptics } from "@/hooks/useHaptics";
 import {
   colors,
   fonts,
-  fontSizes,
   spacing,
   letterSpacing,
   shadows,
@@ -33,7 +32,7 @@ const ICON_MAP: Record<string, TabIconName> = {
   settings: "settings",
 };
 
-const BAR_HEIGHT = 64;
+export const TAB_BAR_HEIGHT = 64;
 const SIDE_MARGIN = spacing.xl;
 const INDICATOR_PADDING = 6;
 
@@ -85,7 +84,7 @@ export function PillTabBar({
           styles.bar,
           {
             width: barWidth,
-            height: BAR_HEIGHT,
+            height: TAB_BAR_HEIGHT,
           },
         ]}
       >

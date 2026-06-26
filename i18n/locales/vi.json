@@ -7,18 +7,11 @@
   "common": {
     "appName": "Serene",
     "tagline": "Bình yên mọi chuyến đi",
-    "start": "Bắt đầu",
     "stop": "Dừng",
-    "back": "Quay lại",
     "next": "Tiếp theo",
     "done": "Xong",
-    "skip": "Bỏ qua",
-    "settings": "Cài đặt",
     "on": "Bật",
-    "off": "Tắt",
-    "enable": "Bật",
-    "disable": "Tắt",
-    "getStarted": "Bắt đầu"
+    "off": "Tắt"
   },
   "home": {
     "greeting": "Chào mừng đến với",
@@ -40,7 +33,7 @@
     "volumeTip": "Âm thanh nên nghe rõ nhưng không bao giờ khó chịu.",
     "headphoneBadge": "Cần tai nghe",
     "startListening": "Bắt đầu nghe",
-    "countdown": "Còn {{seconds}} giây",
+    "secondsUnit": "giây",
     "listening": "Đang phát"
   },
   "done": {
@@ -49,7 +42,6 @@
     "message": "Phiên 100 Hz đã kết thúc. Hít thở và bắt đầu chuyến đi của bạn.",
     "durationLabel": "Hiệu quả ước tính",
     "effectDuration": "Lên tới 2 giờ",
-    "listenAgain": "Nghe lại",
     "enableMotionCues": "Bật Motion Cues",
     "backHome": "Về trang chủ",
     "disclaimer": "Hiệu quả có thể khác nhau tùy người. Dựa trên nghiên cứu từ Đại học Nagoya."
@@ -63,9 +55,6 @@
       "onboarding": {
         "slide1Title": "Dots theo chuyển động xe",
         "slide1Caption": "Khi xe rẽ, tăng tốc hay phanh, các dots dịch chuyển theo — giúp não đồng bộ thị giác với chuyển động.",
-        "slide1CaptionTurning": "Xe rẽ phải...",
-        "slide1CaptionAccelerating": "Tăng tốc...",
-        "slide1CaptionBraking": "Phanh...",
         "slide2Title": "Tại sao nó hoạt động?",
         "slide2Eye": "Mắt thấy dots di chuyển",
         "slide2Ear": "Tai trong cảm nhận xe",

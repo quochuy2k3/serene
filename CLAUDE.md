@@ -15,7 +15,7 @@ Free, non-profit app for iOS + Android. Package: `com.serene.app`.
 - **i18n:** i18next + react-i18next + expo-localization (VI + EN)
 - **Fonts:** Manrope (via @expo-google-fonts/manrope)
 - **Animation:** react-native-reanimated v4 (iOS dots)
-- **Audio:** WebView + Web Audio API (100 Hz sine)
+- **Audio:** expo-audio (pre-rendered 100 Hz sine WAV)
 - **Android native:** Kotlin (MotionCuesService, MotionCuesModule)
 
 ## Architecture
@@ -82,11 +82,11 @@ ios/              → Native iOS code (after prebuild)
 ## Key Technical Details
 
 ### Audio 100 Hz
-- WebView hidden (0×0px) running Web Audio API
-- OscillatorNode: type=sine, frequency=100
-- Duration: exactly 60 seconds
-- WebView `postMessage('done')` back to RN on completion
-- iOS requires user tap gesture before AudioContext can start
+- `expo-audio` plays a pre-rendered 100 Hz sine WAV (`assets/audio/100hz.wav`)
+- Duration: exactly 60 seconds (fade in/out baked into the file to avoid clicks)
+- `setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: false })`
+- Session timing tracked in JS (`useAudioSession`); on completion → `done` screen
+- iOS requires a user tap gesture to start playback (UX enforces tap before play)
 
 ### Motion Cues Overlay (Android)
 - Native Foreground Service (`MotionCuesService.kt`)
@@ -112,7 +112,7 @@ pnpm run lint       # Run linter
 ```
 
 ## Don'ts
-- Don't use `expo-av` for audio — it can't generate sine waves
+- Don't use `expo-av` for audio — the project standardizes on `expo-audio`; the 100 Hz tone ships as a pre-rendered WAV asset
 - Don't use background audio mode — the 100 Hz session is only 60 seconds
 - Don't use private iOS APIs for system overlay — instant App Store rejection
 - Don't claim "cure" or "treat" motion sickness — use "may help reduce symptoms"

@@ -25,14 +25,14 @@ import { PulsingDot } from "@/components/PulsingDot";
 import { useMotionCues } from "@/hooks/useMotionCues";
 import { useHaptics } from "@/hooks/useHaptics";
 import { useScreenEntrance, useStaggeredEntrance } from "@/hooks/useScreenEntrance";
-
-const TAB_BAR_CLEARANCE = 120;
+import { useTabBarClearance } from "@/hooks/useTabBarClearance";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { isActive, iosOverlayEnabled } = useMotionCues();
   const haptics = useHaptics();
+  const tabBarClearance = useTabBarClearance();
 
   const overlayOn = Platform.OS === "android" ? isActive : iosOverlayEnabled;
 
@@ -63,7 +63,10 @@ export default function HomeScreen() {
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: tabBarClearance },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Audio Therapy Card */}
@@ -195,7 +198,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: TAB_BAR_CLEARANCE,
     gap: spacing.lg,
   },
   card: {
