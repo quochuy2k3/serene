@@ -112,6 +112,7 @@ pnpm run lint       # Run linter
 ```
 
 ## Don'ts
+- Don't install `expo-cli` globally — it's the deprecated legacy CLI and drifts out of sync with the SDK; use the project-local `npx expo <cmd>` (and `npx expo install <pkg>` for Expo deps)
 - Don't use `expo-av` for audio — the project standardizes on `expo-audio`; the 100 Hz tone ships as a pre-rendered WAV asset
 - Don't use background audio mode — the 100 Hz session is only 60 seconds
 - Don't use private iOS APIs for system overlay — instant App Store rejection
