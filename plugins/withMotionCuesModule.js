@@ -75,6 +75,7 @@ const withMotionCuesManifest = (config) =>
 
     // Permissions (dedupe against existing)
     const permissions = [
+      "android.permission.SYSTEM_ALERT_WINDOW",
       "android.permission.FOREGROUND_SERVICE",
       "android.permission.FOREGROUND_SERVICE_SPECIAL_USE",
       "android.permission.POST_NOTIFICATIONS",
