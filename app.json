@@ -31,7 +31,8 @@
       "expo-sensors",
       "expo-audio",
       "expo-font",
-      "./plugins/withMotionCuesModule.js"
+      "./plugins/withMotionCuesModule.js",
+      "expo-asset"
     ]
   }
 }
