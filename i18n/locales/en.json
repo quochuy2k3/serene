@@ -76,7 +76,9 @@
         "stopOverlay": "Stop Overlay",
         "permissionRequired": "Overlay permission required",
         "permissionDescription": "Serene needs permission to display dots over other apps",
-        "grantPermission": "Grant Permission"
+        "grantPermission": "Grant Permission",
+        "sensorMissing": "Motion sensor not available",
+        "sensorMissingDescription": "This device doesn't have the linear-acceleration sensor the overlay needs, so the dots can't respond to motion."
       }
     },
     "ios": {

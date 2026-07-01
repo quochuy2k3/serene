@@ -15,6 +15,7 @@ const STORAGE_KEYS = {
 export function useMotionCues() {
   const [isFirstTime, setIsFirstTime] = useState<boolean | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [hasMotionSensor, setHasMotionSensor] = useState(true);
   const [isActive, setIsActive] = useState(false);
   const [iosOverlayEnabled, setIosOverlayEnabled] = useState(false);
   const [iosAppleCuesConfirmed, setIosAppleCuesConfirmed] = useState(false);
@@ -34,6 +35,14 @@ export function useMotionCues() {
       } catch {
         setIsFirstTime(true);
       }
+    })();
+  }, []);
+
+  // Android: probe the linear-acceleration sensor once on mount
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    (async () => {
+      setHasMotionSensor(await MotionCuesModule.hasMotionSensor());
     })();
   }, []);
 
@@ -127,6 +136,7 @@ export function useMotionCues() {
   return {
     isFirstTime,
     hasPermission,
+    hasMotionSensor,
     isActive,
     iosOverlayEnabled,
     iosAppleCuesConfirmed,

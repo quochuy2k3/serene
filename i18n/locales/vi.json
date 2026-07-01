@@ -76,7 +76,9 @@
         "stopOverlay": "Tắt Overlay",
         "permissionRequired": "Cần quyền hiển thị overlay",
         "permissionDescription": "Serene cần quyền hiển thị chấm tròn trên các ứng dụng khác",
-        "grantPermission": "Cấp quyền"
+        "grantPermission": "Cấp quyền",
+        "sensorMissing": "Thiết bị không có cảm biến chuyển động",
+        "sensorMissingDescription": "Thiết bị này không có cảm biến gia tốc tuyến tính mà overlay cần, nên các chấm tròn không thể phản hồi theo chuyển động."
       }
     },
     "ios": {

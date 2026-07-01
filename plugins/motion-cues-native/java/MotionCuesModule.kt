@@ -1,6 +1,9 @@
 package com.serene.app
 
+import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -25,6 +28,19 @@ class MotionCuesModule(private val reactContext: ReactApplicationContext) :
             promise.resolve(if (granted) "granted" else "denied")
         } catch (e: Exception) {
             promise.reject("ERR_CHECK_PERMISSION", e)
+        }
+    }
+
+    @ReactMethod
+    fun hasMotionSensor(promise: Promise) {
+        try {
+            val sensorManager =
+                reactContext.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+            val sensor =
+                sensorManager?.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+            promise.resolve(sensor != null)
+        } catch (e: Exception) {
+            promise.reject("ERR_CHECK_SENSOR", e)
         }
     }
 

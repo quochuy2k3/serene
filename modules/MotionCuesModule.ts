@@ -3,6 +3,7 @@ import { NativeModules, Platform } from "react-native";
 export type PermissionStatus = "granted" | "denied" | "pending";
 
 type MotionCuesNativeModule = {
+  hasMotionSensor: () => Promise<boolean>;
   checkPermission: () => Promise<PermissionStatus>;
   requestPermission: () => Promise<PermissionStatus>;
   startOverlay: () => void;
@@ -29,6 +30,19 @@ function warnMissing(): void {
 
 export const MotionCuesModule = {
   isAvailable,
+
+  // Whether the device exposes the linear-acceleration sensor the overlay
+  // relies on. Returns true when we can't determine it (non-Android or the
+  // native module isn't built yet) so we don't falsely flag a device as
+  // unsupported — the permission path surfaces the missing-module case.
+  async hasMotionSensor(): Promise<boolean> {
+    if (Platform.OS !== "android") return true;
+    if (!isAvailable || !nativeModule) {
+      warnMissing();
+      return true;
+    }
+    return nativeModule.hasMotionSensor();
+  },
 
   async checkPermission(): Promise<PermissionStatus> {
     if (Platform.OS !== "android") return "granted";
