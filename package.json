@@ -8,7 +8,11 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "prebuild": "expo prebuild",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "prebuild:android": "expo prebuild --platform android",
+    "apk": "cd android && ./gradlew installDebug && cd ..",
+    "apk:release": "cd android && ./gradlew installRelease && cd ..",
+    "apk:sync": "pnpm prebuild:android && pnpm apk"
   },
   "dependencies": {
     "@expo-google-fonts/manrope": "^0.4.2",
