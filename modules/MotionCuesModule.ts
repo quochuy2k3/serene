@@ -9,42 +9,60 @@ type MotionCuesNativeModule = {
   stopOverlay: () => void;
 };
 
-const LINKING_ERROR =
-  "MotionCuesModule is only available on Android. " +
-  "Make sure you rebuilt the native project after adding the module.";
+const isAvailable =
+  Platform.OS === "android" && !!NativeModules.MotionCuesModule;
 
-const nativeModule: MotionCuesNativeModule =
-  Platform.OS === "android" && NativeModules.MotionCuesModule
-    ? NativeModules.MotionCuesModule
-    : (new Proxy(
-        {},
-        {
-          get() {
-            throw new Error(LINKING_ERROR);
-          },
-        }
-      ) as MotionCuesNativeModule);
+const nativeModule = NativeModules.MotionCuesModule as
+  | MotionCuesNativeModule
+  | undefined;
+
+let hasWarned = false;
+function warnMissing(): void {
+  if (hasWarned) return;
+  hasWarned = true;
+  console.warn(
+    "MotionCuesModule native module not found. " +
+      "Rebuild the Android project (npx expo prebuild --platform android --clean && npx expo run:android). " +
+      "Overlay features are disabled until then."
+  );
+}
 
 export const MotionCuesModule = {
-  isAvailable: Platform.OS === "android" && !!NativeModules.MotionCuesModule,
+  isAvailable,
 
   async checkPermission(): Promise<PermissionStatus> {
     if (Platform.OS !== "android") return "granted";
+    if (!isAvailable || !nativeModule) {
+      warnMissing();
+      return "denied";
+    }
     return nativeModule.checkPermission();
   },
 
   async requestPermission(): Promise<PermissionStatus> {
     if (Platform.OS !== "android") return "granted";
+    if (!isAvailable || !nativeModule) {
+      warnMissing();
+      return "denied";
+    }
     return nativeModule.requestPermission();
   },
 
   startOverlay(): void {
     if (Platform.OS !== "android") return;
+    if (!isAvailable || !nativeModule) {
+      warnMissing();
+      return;
+    }
     nativeModule.startOverlay();
   },
 
   stopOverlay(): void {
     if (Platform.OS !== "android") return;
+    if (!isAvailable || !nativeModule) {
+      warnMissing();
+      return;
+    }
     nativeModule.stopOverlay();
   },
 };
