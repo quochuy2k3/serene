@@ -5,6 +5,8 @@ import {
   MotionCuesModule,
   type PermissionStatus,
 } from "@/modules/MotionCuesModule";
+import { useSettings } from "@/hooks/useSettings";
+import { resolveOverlayConfig } from "@/constants/config";
 
 const STORAGE_KEYS = {
   firstTime: "serene_motion_cues_first_time",
@@ -19,6 +21,8 @@ export function useMotionCues() {
   const [isActive, setIsActive] = useState(false);
   const [iosOverlayEnabled, setIosOverlayEnabled] = useState(false);
   const [iosAppleCuesConfirmed, setIosAppleCuesConfirmed] = useState(false);
+
+  const { settings } = useSettings();
 
   // Load persisted state
   useEffect(() => {
@@ -92,7 +96,7 @@ export function useMotionCues() {
     // User is now in Settings — AppState listener will re-check on return
   }, []);
 
-  // Android: start foreground service + overlay
+  // Android: start foreground service + overlay with current settings
   const startOverlay = useCallback(async () => {
     if (Platform.OS !== "android") return;
     const status = await MotionCuesModule.checkPermission();
@@ -100,15 +104,30 @@ export function useMotionCues() {
       await MotionCuesModule.requestPermission();
       return;
     }
-    MotionCuesModule.startOverlay();
+    MotionCuesModule.startOverlay(resolveOverlayConfig(settings));
     setIsActive(true);
-  }, []);
+  }, [settings]);
 
   const stopOverlay = useCallback(() => {
     if (Platform.OS !== "android") return;
     MotionCuesModule.stopOverlay();
     setIsActive(false);
   }, []);
+
+  // Restart the running overlay when a visual setting changes so the new
+  // size/density/opacity/sensitivity take effect immediately. Excludes
+  // `isActive` from deps so activation itself doesn't double-start.
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    if (!isActive) return;
+    MotionCuesModule.startOverlay(resolveOverlayConfig(settings));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    settings.dotSize,
+    settings.dotDensity,
+    settings.sensitivity,
+    settings.dotOpacity,
+  ]);
 
   // iOS: toggle in-app overlay
   const toggleIOSOverlay = useCallback(async (enabled: boolean) => {
