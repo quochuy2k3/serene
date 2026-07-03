@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,6 +9,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import Animated from "react-native-reanimated";
+import Slider from "@react-native-community/slider";
 import {
   colors,
   fonts,
@@ -18,7 +20,7 @@ import {
   lineHeights,
   shadows,
 } from "@/constants/theme";
-import { APP_CONFIG } from "@/constants/config";
+import { APP_CONFIG, MOTION_CUES_CONFIG } from "@/constants/config";
 import { Header } from "@/components/Header";
 import { useSettings } from "@/hooks/useSettings";
 import { useHaptics } from "@/hooks/useHaptics";
@@ -35,10 +37,12 @@ export default function SettingsScreen() {
   const tabBarClearance = useTabBarClearance();
 
   const headerEntrance = useScreenEntrance(0);
-  const section1Entrance = useStaggeredEntrance(1);
-  const section2Entrance = useStaggeredEntrance(2);
-  const section3Entrance = useStaggeredEntrance(3);
-  const aboutEntrance = useStaggeredEntrance(4);
+  const sizeEntrance = useStaggeredEntrance(1);
+  const densityEntrance = useStaggeredEntrance(2);
+  const opacityEntrance = useStaggeredEntrance(3);
+  const sensitivityEntrance = useStaggeredEntrance(4);
+  const languageEntrance = useStaggeredEntrance(5);
+  const aboutEntrance = useStaggeredEntrance(6);
 
   const toggleLanguage = () => {
     haptics.select();
@@ -56,6 +60,17 @@ export default function SettingsScreen() {
     { key: "settings.dotSizeMedium" as const, value: "medium" as const },
     { key: "settings.dotSizeLarge" as const, value: "large" as const },
   ];
+
+  const dotDensityOptions = [
+    { key: "settings.densityLow" as const, value: "low" as const },
+    { key: "settings.densityMedium" as const, value: "medium" as const },
+    { key: "settings.densityHigh" as const, value: "high" as const },
+  ];
+
+  const [opacityDraft, setOpacityDraft] = useState(settings.dotOpacity);
+  useEffect(() => {
+    setOpacityDraft(settings.dotOpacity);
+  }, [settings.dotOpacity]);
 
   const sensitivityOptions = [
     { key: "settings.sensitivityLow" as const, value: "low" as const },
@@ -82,7 +97,7 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Dot Size */}
-        <Animated.View style={[styles.section, section1Entrance]}>
+        <Animated.View style={[styles.section, sizeEntrance]}>
           <Text style={styles.sectionLabel}>{t("settings.dotSize")}</Text>
           <View style={styles.segmented}>
             {dotSizeOptions.map(({ key, value }) => {
@@ -109,8 +124,60 @@ export default function SettingsScreen() {
           </View>
         </Animated.View>
 
+        {/* Dot Density */}
+        <Animated.View style={[styles.section, densityEntrance]}>
+          <Text style={styles.sectionLabel}>{t("settings.dotDensity")}</Text>
+          <View style={styles.segmented}>
+            {dotDensityOptions.map(({ key, value }) => {
+              const active = settings.dotDensity === value;
+              return (
+                <Pressable
+                  key={value}
+                  onPress={() =>
+                    handleSegmentPress(() =>
+                      updateSettings({ dotDensity: value })
+                    )
+                  }
+                  style={[styles.segment, active && styles.segmentActive]}
+                >
+                  <Text
+                    style={[
+                      styles.segmentText,
+                      active && styles.segmentTextActive,
+                    ]}
+                  >
+                    {t(key)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </Animated.View>
+
+        {/* Dot Opacity */}
+        <Animated.View style={[styles.section, opacityEntrance]}>
+          <Text style={styles.sectionLabel}>
+            {t("settings.dotOpacity")} — {Math.round(opacityDraft * 100)}%
+          </Text>
+          <Slider
+            style={styles.slider}
+            minimumValue={MOTION_CUES_CONFIG.opacityRange.min}
+            maximumValue={MOTION_CUES_CONFIG.opacityRange.max}
+            step={0.05}
+            value={opacityDraft}
+            minimumTrackTintColor={colors.primary}
+            maximumTrackTintColor={colors.neutralDark}
+            thumbTintColor={colors.primary}
+            onValueChange={setOpacityDraft}
+            onSlidingComplete={(v) => {
+              haptics.select();
+              updateSettings({ dotOpacity: v });
+            }}
+          />
+        </Animated.View>
+
         {/* Sensitivity */}
-        <Animated.View style={[styles.section, section2Entrance]}>
+        <Animated.View style={[styles.section, sensitivityEntrance]}>
           <Text style={styles.sectionLabel}>{t("settings.sensitivity")}</Text>
           <View style={styles.segmented}>
             {sensitivityOptions.map(({ key, value }) => {
@@ -140,7 +207,7 @@ export default function SettingsScreen() {
         </Animated.View>
 
         {/* Language */}
-        <Animated.View style={[styles.section, section3Entrance]}>
+        <Animated.View style={[styles.section, languageEntrance]}>
           <Text style={styles.sectionLabel}>{t("settings.language")}</Text>
           <Pressable style={styles.row} onPress={toggleLanguage}>
             <View style={styles.rowLeft}>
@@ -322,5 +389,9 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     fontSize: fontSizes.xs,
     color: colors.textTertiary,
+  },
+  slider: {
+    width: "100%",
+    height: 40,
   },
 });
