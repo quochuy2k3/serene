@@ -1,4 +1,5 @@
 import { NativeModules, Platform } from "react-native";
+import type { OverlayConfig } from "@/constants/config";
 
 export type PermissionStatus = "granted" | "denied" | "pending";
 
@@ -6,7 +7,12 @@ type MotionCuesNativeModule = {
   hasMotionSensor: () => Promise<boolean>;
   checkPermission: () => Promise<PermissionStatus>;
   requestPermission: () => Promise<PermissionStatus>;
-  startOverlay: () => void;
+  startOverlay: (
+    dotSizeDp: number,
+    sensitivity: number,
+    dotCount: number,
+    opacity: number
+  ) => void;
   stopOverlay: () => void;
 };
 
@@ -62,13 +68,18 @@ export const MotionCuesModule = {
     return nativeModule.requestPermission();
   },
 
-  startOverlay(): void {
+  startOverlay(config: OverlayConfig): void {
     if (Platform.OS !== "android") return;
     if (!isAvailable || !nativeModule) {
       warnMissing();
       return;
     }
-    nativeModule.startOverlay();
+    nativeModule.startOverlay(
+      config.dotSizeDp,
+      config.sensitivity,
+      config.dotCount,
+      config.opacity
+    );
   },
 
   stopOverlay(): void {
