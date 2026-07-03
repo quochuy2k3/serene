@@ -84,9 +84,6 @@ importers:
       i18next:
         specifier: ^26.0.3
         version: 26.0.3(typescript@5.9.3)
-      jest-expo:
-        specifier: ~54.0.17
-        version: 54.0.17(@babel/core@7.29.0)(expo@54.0.35)(jest@29.7.0(@types/node@25.5.2))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -130,6 +127,9 @@ importers:
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@25.5.2)
+      jest-expo:
+        specifier: ~54.0.17
+        version: 54.0.17(@babel/core@7.29.0)(expo@54.0.35)(jest@29.7.0(@types/node@25.5.2))(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
       typescript:
         specifier: ~5.9.2
         version: 5.9.3
