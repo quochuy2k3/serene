@@ -29,7 +29,21 @@ class MotionCuesService : Service(), SensorEventListener {
     private var linearAccelerationSensor: Sensor? = null
     private var dotsView: DotsView? = null
 
+    // Config, refreshed on every onStartCommand.
+    private var dotSizeDp = DEFAULT_DOT_SIZE_DP
+    private var sensitivityMultiplier = DEFAULT_SENSITIVITY_MULT
+    private var dotCount = DEFAULT_DOT_COUNT
+    private var opacity = DEFAULT_OPACITY
+
     override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        linearAccelerationSensor =
+            sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val notification = buildNotification()
@@ -43,6 +57,17 @@ class MotionCuesService : Service(), SensorEventListener {
             startForeground(NOTIF_ID, notification)
         }
 
+        // Refresh config from the (re)start intent. Fallbacks keep a bare
+        // start (e.g. START_STICKY relaunch with null intent) rendering.
+        dotSizeDp = intent?.getFloatExtra(EXTRA_DOT_SIZE_DP, dotSizeDp) ?: dotSizeDp
+        sensitivityMultiplier =
+            intent?.getFloatExtra(EXTRA_SENSITIVITY, sensitivityMultiplier)
+                ?: sensitivityMultiplier
+        dotCount = intent?.getIntExtra(EXTRA_DOT_COUNT, dotCount) ?: dotCount
+        opacity = intent?.getFloatExtra(EXTRA_OPACITY, opacity) ?: opacity
+
+        // Rebuild so a restart (settings change) applies the new look.
+        teardown()
         setupOverlay()
         startSensor()
 
@@ -50,12 +75,9 @@ class MotionCuesService : Service(), SensorEventListener {
     }
 
     private fun setupOverlay() {
-        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        val view = DotsView(this)
+        val positions = positionsFor(dotCount)
+        val view = DotsView(this, dotSizeDp, positions)
 
-        // One full-screen, non-touchable overlay window. We never call
-        // updateViewLayout per frame — the view repaints itself instead,
-        // so WindowManager is not hammered (which would starve other apps).
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -66,9 +88,8 @@ class MotionCuesService : Service(), SensorEventListener {
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         ).apply {
-            // Window-level alpha keeps the system from forcing it down (and
-            // silences the FLAG_NOT_TOUCHABLE alpha warning).
-            alpha = 0.85f
+            // User-configurable window alpha; floor keeps dots visible.
+            alpha = opacity.coerceIn(MIN_OPACITY, 1f)
         }
 
         try {
@@ -80,8 +101,6 @@ class MotionCuesService : Service(), SensorEventListener {
     }
 
     private fun startSensor() {
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        linearAccelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
         linearAccelerationSensor?.let { sensor ->
             sensorManager.registerListener(
                 this,
@@ -91,6 +110,22 @@ class MotionCuesService : Service(), SensorEventListener {
         }
     }
 
+    private fun teardown() {
+        try {
+            sensorManager.unregisterListener(this)
+        } catch (_: Exception) {
+            // Ignore
+        }
+        dotsView?.let { view ->
+            try {
+                windowManager.removeView(view)
+            } catch (_: Exception) {
+                // Ignore
+            }
+        }
+        dotsView = null
+    }
+
     override fun onSensorChanged(event: SensorEvent) {
         if (event.sensor.type != Sensor.TYPE_LINEAR_ACCELERATION) return
         val view = dotsView ?: return
@@ -98,12 +133,12 @@ class MotionCuesService : Service(), SensorEventListener {
         val accelX = event.values[0]
         val accelY = event.values[1]
 
+        val gain = BASE_SENSITIVITY * sensitivityMultiplier
         // Negate X: car turns right → dots shift left (matches Apple)
-        val shiftX = (-accelX * SENSITIVITY).coerceIn(-MAX_SHIFT, MAX_SHIFT)
+        val shiftX = (-accelX * gain).coerceIn(-MAX_SHIFT, MAX_SHIFT)
         // Positive Y: car accelerates → dots shift down
-        val shiftY = (accelY * SENSITIVITY).coerceIn(-MAX_SHIFT, MAX_SHIFT)
+        val shiftY = (accelY * gain).coerceIn(-MAX_SHIFT, MAX_SHIFT)
 
-        // Coalesced to the display vsync (~60fps) — no WindowManager traffic.
         view.updateShift(shiftX, shiftY)
     }
 
@@ -137,31 +172,23 @@ class MotionCuesService : Service(), SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        try {
-            sensorManager.unregisterListener(this)
-        } catch (_: Exception) {
-            // Ignore
-        }
-        dotsView?.let { view ->
-            try {
-                windowManager.removeView(view)
-            } catch (_: Exception) {
-                // Ignore
-            }
-        }
-        dotsView = null
+        teardown()
     }
 
     /**
-     * Draws all 8 dots in a single overlay window. Sensor updates only mutate
+     * Draws all dots in a single overlay window. Sensor updates only mutate
      * the shift fields and request a vsync-throttled repaint, so the heavy
      * per-frame WindowManager.updateViewLayout path is gone entirely.
      */
     @SuppressLint("ViewConstructor")
-    private class DotsView(context: Context) : View(context) {
+    private class DotsView(
+        context: Context,
+        dotSizeDp: Float,
+        private val positions: List<Pair<Float, Float>>
+    ) : View(context) {
 
         private val density = resources.displayMetrics.density
-        private val radiusPx = DOT_SIZE_DP * density / 2f
+        private val radiusPx = dotSizeDp * density / 2f
 
         private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#E6FFFFFF")
@@ -185,7 +212,7 @@ class MotionCuesService : Service(), SensorEventListener {
         override fun onDraw(canvas: Canvas) {
             val w = width.toFloat()
             val h = height.toFloat()
-            for ((xRatio, yRatio) in DOT_POSITIONS) {
+            for ((xRatio, yRatio) in positions) {
                 val cx = w * xRatio + shiftX
                 val cy = h * yRatio + shiftY
                 canvas.drawCircle(cx, cy, radiusPx, fillPaint)
@@ -198,12 +225,28 @@ class MotionCuesService : Service(), SensorEventListener {
         const val NOTIF_ID = 1001
         const val CHANNEL_ID = "serene_motion_cues"
 
-        private const val DOT_SIZE_DP = 12f
-        private const val SENSITIVITY = 6f
+        const val EXTRA_DOT_SIZE_DP = "dotSizeDp"
+        const val EXTRA_SENSITIVITY = "sensitivity"
+        const val EXTRA_DOT_COUNT = "dotCount"
+        const val EXTRA_OPACITY = "opacity"
+
+        private const val DEFAULT_DOT_SIZE_DP = 12f
+        private const val DEFAULT_SENSITIVITY_MULT = 1f
+        private const val DEFAULT_DOT_COUNT = 8
+        private const val DEFAULT_OPACITY = 0.85f
+        private const val MIN_OPACITY = 0.2f
+
+        private const val BASE_SENSITIVITY = 6f
         private const val MAX_SHIFT = 40f
 
-        // 8 dot positions as ratios of screen width/height
-        private val DOT_POSITIONS = listOf(
+        private val LOW_POSITIONS = listOf(
+            0.25f to 0.04f,
+            0.75f to 0.04f,
+            0.25f to 0.96f,
+            0.75f to 0.96f
+        )
+
+        private val MEDIUM_POSITIONS = listOf(
             0.25f to 0.04f,   // top-left
             0.75f to 0.04f,   // top-right
             0.04f to 0.25f,   // left-top
@@ -213,5 +256,19 @@ class MotionCuesService : Service(), SensorEventListener {
             0.25f to 0.96f,   // bottom-left
             0.75f to 0.96f    // bottom-right
         )
+
+        private val HIGH_POSITIONS = MEDIUM_POSITIONS + listOf(
+            0.50f to 0.04f,   // top-mid
+            0.50f to 0.96f,   // bottom-mid
+            0.04f to 0.50f,   // left-mid
+            0.96f to 0.50f    // right-mid
+        )
+
+        private fun positionsFor(count: Int): List<Pair<Float, Float>> =
+            when (count) {
+                4 -> LOW_POSITIONS
+                12 -> HIGH_POSITIONS
+                else -> MEDIUM_POSITIONS
+            }
     }
 }
