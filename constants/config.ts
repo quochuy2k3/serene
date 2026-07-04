@@ -6,13 +6,11 @@ export const AUDIO_CONFIG = {
 } as const;
 
 export const MOTION_CUES_CONFIG = {
-  dotCount: 8,
   defaultDotSize: "medium" as const,
   defaultDotDensity: "medium" as const,
   defaultOpacity: 0.6,
   defaultSensitivity: "medium" as const,
-  sensorUpdateInterval: 16, // ~60fps
-  maxShift: 30,
+  sensorUpdateInterval: 16, // ~60fps (iOS in-app overlay accelerometer rate)
   opacityRange: { min: 0.2, max: 1.0 },
   dotSizes: {
     small: 8,
