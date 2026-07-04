@@ -21,7 +21,7 @@
       "package": "com.serene.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F5F7F7"
+        "backgroundColor": "#2C5766"
       },
       "predictiveBackGestureEnabled": false
     },
