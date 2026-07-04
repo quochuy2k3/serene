@@ -51,6 +51,10 @@
     "title": "Motion Cues",
     "howItWorks": "8 subtle dots on your screen edges move with your vehicle's motion, helping your brain reconcile what your eyes see with what your body feels.",
     "reviewGuide": "Review the guide",
+    "notification": {
+      "title": "Serene — Motion Cues active",
+      "text": "Helping reduce motion sickness"
+    },
     "android": {
       "onboarding": {
         "slide1Title": "Dots that follow your vehicle",

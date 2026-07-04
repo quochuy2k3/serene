@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { AppState, Platform } from "react-native";
+import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   MotionCuesModule,
@@ -23,6 +24,17 @@ export function useMotionCues() {
   const [iosAppleCuesConfirmed, setIosAppleCuesConfirmed] = useState(false);
 
   const { settings } = useSettings();
+  const { t } = useTranslation();
+
+  // Localized copy for the foreground-service notification (Android). Built
+  // here so the native layer never has to hardcode a language.
+  const overlayNotification = useCallback(
+    () => ({
+      title: t("motionCues.notification.title"),
+      text: t("motionCues.notification.text"),
+    }),
+    [t]
+  );
 
   // Load persisted state
   useEffect(() => {
@@ -54,9 +66,17 @@ export function useMotionCues() {
   useEffect(() => {
     if (Platform.OS !== "android") return;
 
+    let cancelled = false;
+
     const check = async () => {
       const status: PermissionStatus = await MotionCuesModule.checkPermission();
+      if (cancelled) return;
       setHasPermission(status === "granted");
+      // Resync with the real service so the UI never shows "off" while the
+      // overlay is still up (e.g. after the app is reopened).
+      const active = await MotionCuesModule.isOverlayActive();
+      if (cancelled) return;
+      setIsActive(active);
     };
     check();
 
@@ -67,6 +87,7 @@ export function useMotionCues() {
     });
 
     return () => {
+      cancelled = true;
       subscription.remove();
     };
   }, []);
@@ -104,9 +125,12 @@ export function useMotionCues() {
       await MotionCuesModule.requestPermission();
       return;
     }
-    MotionCuesModule.startOverlay(resolveOverlayConfig(settings));
+    MotionCuesModule.startOverlay(
+      resolveOverlayConfig(settings),
+      overlayNotification()
+    );
     setIsActive(true);
-  }, [settings]);
+  }, [settings, overlayNotification]);
 
   const stopOverlay = useCallback(() => {
     if (Platform.OS !== "android") return;
@@ -120,7 +144,10 @@ export function useMotionCues() {
   useEffect(() => {
     if (Platform.OS !== "android") return;
     if (!isActive) return;
-    MotionCuesModule.startOverlay(resolveOverlayConfig(settings));
+    MotionCuesModule.startOverlay(
+      resolveOverlayConfig(settings),
+      overlayNotification()
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     settings.dotSize,

@@ -11,9 +11,18 @@ type MotionCuesNativeModule = {
     dotSizeDp: number,
     sensitivity: number,
     dotCount: number,
-    opacity: number
+    opacity: number,
+    notifTitle: string,
+    notifText: string
   ) => void;
   stopOverlay: () => void;
+  isOverlayActive: () => Promise<boolean>;
+};
+
+/** Localized foreground-service notification copy (source: i18next). */
+export type OverlayNotification = {
+  title: string;
+  text: string;
 };
 
 const isAvailable =
@@ -68,7 +77,7 @@ export const MotionCuesModule = {
     return nativeModule.requestPermission();
   },
 
-  startOverlay(config: OverlayConfig): void {
+  startOverlay(config: OverlayConfig, notification: OverlayNotification): void {
     if (Platform.OS !== "android") return;
     if (!isAvailable || !nativeModule) {
       warnMissing();
@@ -78,7 +87,9 @@ export const MotionCuesModule = {
       config.dotSizeDp,
       config.sensitivity,
       config.dotCount,
-      config.opacity
+      config.opacity,
+      notification.title,
+      notification.text
     );
   },
 
@@ -89,5 +100,16 @@ export const MotionCuesModule = {
       return;
     }
     nativeModule.stopOverlay();
+  },
+
+  // Whether the native overlay service is currently running. Lets the UI
+  // resync its on/off state with reality after the app is reopened.
+  async isOverlayActive(): Promise<boolean> {
+    if (Platform.OS !== "android") return false;
+    if (!isAvailable || !nativeModule) {
+      warnMissing();
+      return false;
+    }
+    return nativeModule.isOverlayActive();
   },
 };

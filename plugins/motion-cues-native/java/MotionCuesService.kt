@@ -18,6 +18,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
@@ -35,6 +36,11 @@ class MotionCuesService : Service(), SensorEventListener {
     private var dotCount = DEFAULT_DOT_COUNT
     private var opacity = DEFAULT_OPACITY
 
+    // Notification copy, localized by the JS layer (i18next) and passed in
+    // via the start intent. English fallbacks keep a bare start readable.
+    private var notifTitle = DEFAULT_NOTIF_TITLE
+    private var notifText = DEFAULT_NOTIF_TEXT
+
     // Low-pass filtered dot offset. Kept across frames so we can ease toward
     // each new sensor target instead of snapping to it.
     private var smoothedShiftX = 0f
@@ -51,6 +57,18 @@ class MotionCuesService : Service(), SensorEventListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Refresh config + notification copy from the (re)start intent before
+        // anything reads them. Fallbacks keep a bare start (missing extra)
+        // rendering.
+        dotSizeDp = intent?.getFloatExtra(EXTRA_DOT_SIZE_DP, dotSizeDp) ?: dotSizeDp
+        sensitivityMultiplier =
+            intent?.getFloatExtra(EXTRA_SENSITIVITY, sensitivityMultiplier)
+                ?: sensitivityMultiplier
+        dotCount = intent?.getIntExtra(EXTRA_DOT_COUNT, dotCount) ?: dotCount
+        opacity = intent?.getFloatExtra(EXTRA_OPACITY, opacity) ?: opacity
+        notifTitle = intent?.getStringExtra(EXTRA_NOTIF_TITLE) ?: notifTitle
+        notifText = intent?.getStringExtra(EXTRA_NOTIF_TEXT) ?: notifText
+
         val notification = buildNotification()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
@@ -62,24 +80,34 @@ class MotionCuesService : Service(), SensorEventListener {
             startForeground(NOTIF_ID, notification)
         }
 
-        // Refresh config from the (re)start intent. Fallbacks keep a bare
-        // start (e.g. START_STICKY relaunch with null intent) rendering.
-        dotSizeDp = intent?.getFloatExtra(EXTRA_DOT_SIZE_DP, dotSizeDp) ?: dotSizeDp
-        sensitivityMultiplier =
-            intent?.getFloatExtra(EXTRA_SENSITIVITY, sensitivityMultiplier)
-                ?: sensitivityMultiplier
-        dotCount = intent?.getIntExtra(EXTRA_DOT_COUNT, dotCount) ?: dotCount
-        opacity = intent?.getFloatExtra(EXTRA_OPACITY, opacity) ?: opacity
-
-        // Rebuild so a restart (settings change) applies the new look.
+        // Rebuild so a restart (settings change) applies the new look. Only
+        // mark running / start the sensor if the overlay window actually
+        // attached — otherwise the permission was revoked and we'd be draining
+        // the sensor for an invisible overlay while reporting "active".
         teardown()
-        setupOverlay()
-        startSensor()
+        if (setupOverlay()) {
+            startSensor()
+            isRunning = true
+        } else {
+            isRunning = false
+            stopSelf()
+        }
 
-        return START_STICKY
+        // NOT_STICKY: once the overlay is gone (stopped, killed, or task
+        // swiped away) the system must not silently resurrect it — the JS
+        // layer owns when it turns back on.
+        return START_NOT_STICKY
     }
 
-    private fun setupOverlay() {
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        // User swiped the app out of Recents — don't leave the overlay
+        // lingering on top of other apps. Tear down and stop.
+        stopSelf()
+        super.onTaskRemoved(rootIntent)
+    }
+
+    /** Attaches the overlay window. Returns true only if it actually attached. */
+    private fun setupOverlay(): Boolean {
         val positions = positionsFor(dotCount)
         val view = DotsView(this, dotSizeDp, positions)
 
@@ -97,11 +125,14 @@ class MotionCuesService : Service(), SensorEventListener {
             alpha = opacity.coerceIn(MIN_OPACITY, 1f)
         }
 
-        try {
+        return try {
             windowManager.addView(view, params)
             dotsView = view
-        } catch (_: Exception) {
-            // Permission may have been revoked or device doesn't support it
+            true
+        } catch (e: Exception) {
+            // Overlay permission was likely revoked, or the device blocks it.
+            Log.w(TAG, "Overlay addView failed; stopping service", e)
+            false
         }
     }
 
@@ -175,8 +206,8 @@ class MotionCuesService : Service(), SensorEventListener {
         }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Serene — Motion Cues active")
-            .setContentText("Helping reduce motion sickness")
+            .setContentTitle(notifTitle)
+            .setContentText(notifText)
             .setSmallIcon(android.R.drawable.ic_menu_info_details)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_MIN)
@@ -186,6 +217,7 @@ class MotionCuesService : Service(), SensorEventListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        isRunning = false
         teardown()
     }
 
@@ -236,6 +268,14 @@ class MotionCuesService : Service(), SensorEventListener {
     }
 
     companion object {
+        // True while the overlay is up. Read by the JS bridge so the UI can
+        // resync its on/off state with reality (e.g. after the app is
+        // reopened while the service is or isn't still running).
+        @Volatile
+        var isRunning = false
+
+        private const val TAG = "MotionCuesService"
+
         const val NOTIF_ID = 1001
         const val CHANNEL_ID = "serene_motion_cues"
 
@@ -243,12 +283,21 @@ class MotionCuesService : Service(), SensorEventListener {
         const val EXTRA_SENSITIVITY = "sensitivity"
         const val EXTRA_DOT_COUNT = "dotCount"
         const val EXTRA_OPACITY = "opacity"
+        const val EXTRA_NOTIF_TITLE = "notifTitle"
+        const val EXTRA_NOTIF_TEXT = "notifText"
 
+        // Kept in sync with MOTION_CUES_CONFIG defaults (config.ts): medium
+        // size = 12dp, medium sensitivity = 1.0, medium density = 8, default
+        // opacity = 0.6. Only used if a start intent omits an extra.
         private const val DEFAULT_DOT_SIZE_DP = 12f
         private const val DEFAULT_SENSITIVITY_MULT = 1f
         private const val DEFAULT_DOT_COUNT = 8
-        private const val DEFAULT_OPACITY = 0.85f
+        private const val DEFAULT_OPACITY = 0.6f
         private const val MIN_OPACITY = 0.2f
+
+        // English fallbacks; the live copy is passed in localized from JS.
+        private const val DEFAULT_NOTIF_TITLE = "Serene — Motion Cues active"
+        private const val DEFAULT_NOTIF_TEXT = "Helping reduce motion sickness"
 
         private const val BASE_SENSITIVITY = 6f
         private const val MAX_SHIFT = 40f

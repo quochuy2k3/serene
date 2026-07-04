@@ -73,13 +73,17 @@ class MotionCuesModule(private val reactContext: ReactApplicationContext) :
         dotSizeDp: Double,
         sensitivity: Double,
         dotCount: Int,
-        opacity: Double
+        opacity: Double,
+        notifTitle: String,
+        notifText: String
     ) {
         val intent = Intent(reactContext, MotionCuesService::class.java).apply {
             putExtra(MotionCuesService.EXTRA_DOT_SIZE_DP, dotSizeDp.toFloat())
             putExtra(MotionCuesService.EXTRA_SENSITIVITY, sensitivity.toFloat())
             putExtra(MotionCuesService.EXTRA_DOT_COUNT, dotCount)
             putExtra(MotionCuesService.EXTRA_OPACITY, opacity.toFloat())
+            putExtra(MotionCuesService.EXTRA_NOTIF_TITLE, notifTitle)
+            putExtra(MotionCuesService.EXTRA_NOTIF_TEXT, notifText)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             reactContext.startForegroundService(intent)
@@ -92,6 +96,11 @@ class MotionCuesModule(private val reactContext: ReactApplicationContext) :
     fun stopOverlay() {
         val intent = Intent(reactContext, MotionCuesService::class.java)
         reactContext.stopService(intent)
+    }
+
+    @ReactMethod
+    fun isOverlayActive(promise: Promise) {
+        promise.resolve(MotionCuesService.isRunning)
     }
 
     // Required for new architecture event emitter compatibility (even if unused)
