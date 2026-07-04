@@ -35,6 +35,11 @@ class MotionCuesService : Service(), SensorEventListener {
     private var dotCount = DEFAULT_DOT_COUNT
     private var opacity = DEFAULT_OPACITY
 
+    // Low-pass filtered dot offset. Kept across frames so we can ease toward
+    // each new sensor target instead of snapping to it.
+    private var smoothedShiftX = 0f
+    private var smoothedShiftY = 0f
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
@@ -124,6 +129,9 @@ class MotionCuesService : Service(), SensorEventListener {
             }
         }
         dotsView = null
+        // Reset the filter so a restart doesn't inherit a stale offset.
+        smoothedShiftX = 0f
+        smoothedShiftY = 0f
     }
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -135,11 +143,17 @@ class MotionCuesService : Service(), SensorEventListener {
 
         val gain = BASE_SENSITIVITY * sensitivityMultiplier
         // Negate X: car turns right → dots shift left (matches Apple)
-        val shiftX = (-accelX * gain).coerceIn(-MAX_SHIFT, MAX_SHIFT)
+        val targetX = (-accelX * gain).coerceIn(-MAX_SHIFT, MAX_SHIFT)
         // Positive Y: car accelerates → dots shift down
-        val shiftY = (accelY * gain).coerceIn(-MAX_SHIFT, MAX_SHIFT)
+        val targetY = (accelY * gain).coerceIn(-MAX_SHIFT, MAX_SHIFT)
 
-        view.updateShift(shiftX, shiftY)
+        // Low-pass (EMA) filter: track sustained motion like braking or
+        // turning while damping the high-frequency spikes a hard shake
+        // produces, so the dots glide instead of snapping to the clamp.
+        smoothedShiftX += LOW_PASS_ALPHA * (targetX - smoothedShiftX)
+        smoothedShiftY += LOW_PASS_ALPHA * (targetY - smoothedShiftY)
+
+        view.updateShift(smoothedShiftX, smoothedShiftY)
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -238,6 +252,9 @@ class MotionCuesService : Service(), SensorEventListener {
 
         private const val BASE_SENSITIVITY = 6f
         private const val MAX_SHIFT = 40f
+        // EMA weight for a new sensor sample (~100ms time constant at
+        // SENSOR_DELAY_GAME). Lower = smoother but laggier.
+        private const val LOW_PASS_ALPHA = 0.2f
 
         private val LOW_POSITIONS = listOf(
             0.25f to 0.04f,
