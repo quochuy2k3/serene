@@ -51,6 +51,10 @@
     "title": "Motion Cues",
     "howItWorks": "8 chấm tròn nhỏ ở viền màn hình di chuyển theo chuyển động xe, giúp não bộ đồng bộ những gì mắt nhìn thấy với cảm nhận của cơ thể.",
     "reviewGuide": "Xem lại hướng dẫn",
+    "notification": {
+      "title": "Serene — Motion Cues đang bật",
+      "text": "Giúp giảm say tàu xe"
+    },
     "android": {
       "onboarding": {
         "slide1Title": "Dots theo chuyển động xe",
@@ -76,7 +80,9 @@
         "stopOverlay": "Tắt Overlay",
         "permissionRequired": "Cần quyền hiển thị overlay",
         "permissionDescription": "Serene cần quyền hiển thị chấm tròn trên các ứng dụng khác",
-        "grantPermission": "Cấp quyền"
+        "grantPermission": "Cấp quyền",
+        "sensorMissing": "Thiết bị không có cảm biến chuyển động",
+        "sensorMissingDescription": "Thiết bị này không có cảm biến gia tốc tuyến tính mà overlay cần, nên các chấm tròn không thể phản hồi theo chuyển động."
       }
     },
     "ios": {
@@ -116,6 +122,10 @@
     "dotSizeSmall": "Nhỏ",
     "dotSizeMedium": "Vừa",
     "dotSizeLarge": "Lớn",
+    "dotDensity": "Mật độ chấm",
+    "densityLow": "Thấp",
+    "densityMedium": "Vừa",
+    "densityHigh": "Cao",
     "dotOpacity": "Độ mờ",
     "sensitivity": "Độ nhạy",
     "sensitivityLow": "Thấp",

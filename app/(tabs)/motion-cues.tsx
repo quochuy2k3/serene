@@ -265,6 +265,7 @@ function AndroidControlScreen({
   const tabBarClearance = useTabBarClearance();
   const {
     hasPermission,
+    hasMotionSensor,
     isActive,
     startOverlay,
     stopOverlay,
@@ -305,7 +306,18 @@ function AndroidControlScreen({
         </Text>
       </View>
 
-      {!hasPermission && (
+      {!hasMotionSensor && (
+        <View style={controlStyles.warningCard}>
+          <Text style={controlStyles.warningTitle}>
+            {t("motionCues.android.control.sensorMissing")}
+          </Text>
+          <Text style={controlStyles.warningText}>
+            {t("motionCues.android.control.sensorMissingDescription")}
+          </Text>
+        </View>
+      )}
+
+      {hasMotionSensor && !hasPermission && (
         <View style={controlStyles.warningCard}>
           <Text style={controlStyles.warningTitle}>
             {t("motionCues.android.control.permissionRequired")}
@@ -339,7 +351,7 @@ function AndroidControlScreen({
             variant="primary"
             size="lg"
             fullWidth
-            disabled={!hasPermission}
+            disabled={!hasPermission || !hasMotionSensor}
           />
         )}
       </View>

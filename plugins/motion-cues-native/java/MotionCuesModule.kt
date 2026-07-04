@@ -1,6 +1,9 @@
 package com.serene.app
 
+import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -29,6 +32,19 @@ class MotionCuesModule(private val reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
+    fun hasMotionSensor(promise: Promise) {
+        try {
+            val sensorManager =
+                reactContext.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+            val sensor =
+                sensorManager?.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+            promise.resolve(sensor != null)
+        } catch (e: Exception) {
+            promise.reject("ERR_CHECK_SENSOR", e)
+        }
+    }
+
+    @ReactMethod
     fun requestPermission(promise: Promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -53,8 +69,22 @@ class MotionCuesModule(private val reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun startOverlay() {
-        val intent = Intent(reactContext, MotionCuesService::class.java)
+    fun startOverlay(
+        dotSizeDp: Double,
+        sensitivity: Double,
+        dotCount: Int,
+        opacity: Double,
+        notifTitle: String,
+        notifText: String
+    ) {
+        val intent = Intent(reactContext, MotionCuesService::class.java).apply {
+            putExtra(MotionCuesService.EXTRA_DOT_SIZE_DP, dotSizeDp.toFloat())
+            putExtra(MotionCuesService.EXTRA_SENSITIVITY, sensitivity.toFloat())
+            putExtra(MotionCuesService.EXTRA_DOT_COUNT, dotCount)
+            putExtra(MotionCuesService.EXTRA_OPACITY, opacity.toFloat())
+            putExtra(MotionCuesService.EXTRA_NOTIF_TITLE, notifTitle)
+            putExtra(MotionCuesService.EXTRA_NOTIF_TEXT, notifText)
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             reactContext.startForegroundService(intent)
         } else {
@@ -66,6 +96,11 @@ class MotionCuesModule(private val reactContext: ReactApplicationContext) :
     fun stopOverlay() {
         val intent = Intent(reactContext, MotionCuesService::class.java)
         reactContext.stopService(intent)
+    }
+
+    @ReactMethod
+    fun isOverlayActive(promise: Promise) {
+        promise.resolve(MotionCuesService.isRunning)
     }
 
     // Required for new architecture event emitter compatibility (even if unused)

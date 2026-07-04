@@ -1,12 +1,28 @@
 import { NativeModules, Platform } from "react-native";
+import type { OverlayConfig } from "@/constants/config";
 
 export type PermissionStatus = "granted" | "denied" | "pending";
 
 type MotionCuesNativeModule = {
+  hasMotionSensor: () => Promise<boolean>;
   checkPermission: () => Promise<PermissionStatus>;
   requestPermission: () => Promise<PermissionStatus>;
-  startOverlay: () => void;
+  startOverlay: (
+    dotSizeDp: number,
+    sensitivity: number,
+    dotCount: number,
+    opacity: number,
+    notifTitle: string,
+    notifText: string
+  ) => void;
   stopOverlay: () => void;
+  isOverlayActive: () => Promise<boolean>;
+};
+
+/** Localized foreground-service notification copy (source: i18next). */
+export type OverlayNotification = {
+  title: string;
+  text: string;
 };
 
 const isAvailable =
@@ -30,6 +46,19 @@ function warnMissing(): void {
 export const MotionCuesModule = {
   isAvailable,
 
+  // Whether the device exposes the linear-acceleration sensor the overlay
+  // relies on. Returns true when we can't determine it (non-Android or the
+  // native module isn't built yet) so we don't falsely flag a device as
+  // unsupported — the permission path surfaces the missing-module case.
+  async hasMotionSensor(): Promise<boolean> {
+    if (Platform.OS !== "android") return true;
+    if (!isAvailable || !nativeModule) {
+      warnMissing();
+      return true;
+    }
+    return nativeModule.hasMotionSensor();
+  },
+
   async checkPermission(): Promise<PermissionStatus> {
     if (Platform.OS !== "android") return "granted";
     if (!isAvailable || !nativeModule) {
@@ -48,13 +77,20 @@ export const MotionCuesModule = {
     return nativeModule.requestPermission();
   },
 
-  startOverlay(): void {
+  startOverlay(config: OverlayConfig, notification: OverlayNotification): void {
     if (Platform.OS !== "android") return;
     if (!isAvailable || !nativeModule) {
       warnMissing();
       return;
     }
-    nativeModule.startOverlay();
+    nativeModule.startOverlay(
+      config.dotSizeDp,
+      config.sensitivity,
+      config.dotCount,
+      config.opacity,
+      notification.title,
+      notification.text
+    );
   },
 
   stopOverlay(): void {
@@ -64,5 +100,16 @@ export const MotionCuesModule = {
       return;
     }
     nativeModule.stopOverlay();
+  },
+
+  // Whether the native overlay service is currently running. Lets the UI
+  // resync its on/off state with reality after the app is reopened.
+  async isOverlayActive(): Promise<boolean> {
+    if (Platform.OS !== "android") return false;
+    if (!isAvailable || !nativeModule) {
+      warnMissing();
+      return false;
+    }
+    return nativeModule.isOverlayActive();
   },
 };
