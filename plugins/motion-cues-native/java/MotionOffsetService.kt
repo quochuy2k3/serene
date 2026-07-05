@@ -23,7 +23,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 
-class MotionCuesService : Service(), SensorEventListener {
+class MotionOffsetService : Service(), SensorEventListener {
 
     private lateinit var windowManager: WindowManager
     private lateinit var sensorManager: SensorManager
@@ -274,7 +274,7 @@ class MotionCuesService : Service(), SensorEventListener {
         @Volatile
         var isRunning = false
 
-        private const val TAG = "MotionCuesService"
+        private const val TAG = "MotionOffsetService"
 
         const val NOTIF_ID = 1001
         const val CHANNEL_ID = "serene_motion_cues"

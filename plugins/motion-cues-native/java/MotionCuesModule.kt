@@ -68,22 +68,42 @@ class MotionCuesModule(private val reactContext: ReactApplicationContext) :
         }
     }
 
+    /**
+     * Starts the overlay in one of two animation styles:
+     * - "dynamic" → [MotionFlowService] (v2, scrolling optic-flow field)
+     * - anything else ("regular") → [MotionOffsetService] (v1, offset dots)
+     *
+     * Only one style may run at a time, so the other service is stopped first.
+     * Both services read the same EXTRA_* keys.
+     */
     @ReactMethod
     fun startOverlay(
         dotSizeDp: Double,
         sensitivity: Double,
         dotCount: Int,
         opacity: Double,
+        style: String,
+        flowParams: String,
         notifTitle: String,
         notifText: String
     ) {
-        val intent = Intent(reactContext, MotionCuesService::class.java).apply {
-            putExtra(MotionCuesService.EXTRA_DOT_SIZE_DP, dotSizeDp.toFloat())
-            putExtra(MotionCuesService.EXTRA_SENSITIVITY, sensitivity.toFloat())
-            putExtra(MotionCuesService.EXTRA_DOT_COUNT, dotCount)
-            putExtra(MotionCuesService.EXTRA_OPACITY, opacity.toFloat())
-            putExtra(MotionCuesService.EXTRA_NOTIF_TITLE, notifTitle)
-            putExtra(MotionCuesService.EXTRA_NOTIF_TEXT, notifText)
+        val useDynamic = style == "dynamic"
+        // Stop the other style so the two overlays never stack.
+        val otherClass =
+            if (useDynamic) MotionOffsetService::class.java else MotionFlowService::class.java
+        reactContext.stopService(Intent(reactContext, otherClass))
+
+        val targetClass =
+            if (useDynamic) MotionFlowService::class.java else MotionOffsetService::class.java
+        val intent = Intent(reactContext, targetClass).apply {
+            putExtra(MotionOffsetService.EXTRA_DOT_SIZE_DP, dotSizeDp.toFloat())
+            putExtra(MotionOffsetService.EXTRA_SENSITIVITY, sensitivity.toFloat())
+            putExtra(MotionOffsetService.EXTRA_DOT_COUNT, dotCount)
+            putExtra(MotionOffsetService.EXTRA_OPACITY, opacity.toFloat())
+            putExtra(MotionOffsetService.EXTRA_NOTIF_TITLE, notifTitle)
+            putExtra(MotionOffsetService.EXTRA_NOTIF_TEXT, notifText)
+            // Physics tuning JSON — only MotionFlowService (v2) reads it.
+            putExtra(MotionFlowService.EXTRA_FLOW_PARAMS, flowParams)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             reactContext.startForegroundService(intent)
@@ -94,13 +114,14 @@ class MotionCuesModule(private val reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun stopOverlay() {
-        val intent = Intent(reactContext, MotionCuesService::class.java)
-        reactContext.stopService(intent)
+        // Stop whichever style might be running.
+        reactContext.stopService(Intent(reactContext, MotionOffsetService::class.java))
+        reactContext.stopService(Intent(reactContext, MotionFlowService::class.java))
     }
 
     @ReactMethod
     fun isOverlayActive(promise: Promise) {
-        promise.resolve(MotionCuesService.isRunning)
+        promise.resolve(MotionOffsetService.isRunning || MotionFlowService.isRunning)
     }
 
     // Required for new architecture event emitter compatibility (even if unused)

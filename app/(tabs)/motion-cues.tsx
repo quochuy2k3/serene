@@ -7,6 +7,7 @@ import {
   Platform,
   Linking,
   Switch,
+  Pressable,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
@@ -26,7 +27,9 @@ import {
 } from "@/components/OnboardingSlides";
 import { DemoPhoneMockup } from "@/components/DemoPhoneMockup";
 import { useMotionCues } from "@/hooks/useMotionCues";
+import { useSettings } from "@/hooks/useSettings";
 import { useTabBarClearance } from "@/hooks/useTabBarClearance";
+import type { MotionStyle } from "@/constants/config";
 
 // ============================================================
 // Android Onboarding Slides
@@ -253,6 +256,70 @@ async function openAccessibilitySettings(): Promise<void> {
 }
 
 // ============================================================
+// Motion Style Picker (Android — Regular v1 / Dynamic v2)
+// ============================================================
+
+const MOTION_STYLE_OPTIONS = [
+  {
+    value: "regular",
+    labelKey: "motionCues.android.control.styleRegular",
+    descKey: "motionCues.android.control.styleRegularDescription",
+  },
+  {
+    value: "dynamic",
+    labelKey: "motionCues.android.control.styleDynamic",
+    descKey: "motionCues.android.control.styleDynamicDescription",
+  },
+] as const;
+
+function MotionStylePicker({
+  value,
+  onChange,
+}: {
+  value: MotionStyle;
+  onChange: (style: MotionStyle) => void;
+}) {
+  const { t } = useTranslation();
+  const activeDescKey = MOTION_STYLE_OPTIONS.find((o) => o.value === value)
+    ?.descKey;
+
+  return (
+    <View style={controlStyles.card}>
+      <Text style={controlStyles.cardTitle}>
+        {t("motionCues.android.control.styleTitle")}
+      </Text>
+      <View style={controlStyles.segmented}>
+        {MOTION_STYLE_OPTIONS.map(({ value: v, labelKey }) => {
+          const active = value === v;
+          return (
+            <Pressable
+              key={v}
+              onPress={() => onChange(v)}
+              style={[
+                controlStyles.segment,
+                active && controlStyles.segmentActive,
+              ]}
+            >
+              <Text
+                style={[
+                  controlStyles.segmentText,
+                  active && controlStyles.segmentTextActive,
+                ]}
+              >
+                {t(labelKey)}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+      {activeDescKey && (
+        <Text style={controlStyles.cardDescription}>{t(activeDescKey)}</Text>
+      )}
+    </View>
+  );
+}
+
+// ============================================================
 // Android Control Screen
 // ============================================================
 
@@ -271,6 +338,7 @@ function AndroidControlScreen({
     stopOverlay,
     requestAndroidPermission,
   } = useMotionCues();
+  const { settings, updateSettings } = useSettings();
 
   return (
     <ScrollView
@@ -334,6 +402,11 @@ function AndroidControlScreen({
           />
         </View>
       )}
+
+      <MotionStylePicker
+        value={settings.motionStyle}
+        onChange={(style) => updateSettings({ motionStyle: style })}
+      />
 
       <View style={controlStyles.actionButton}>
         {isActive ? (
@@ -865,5 +938,29 @@ const controlStyles = StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 20,
     marginBottom: spacing.xs,
+  },
+  segmented: {
+    flexDirection: "row",
+    backgroundColor: colors.neutral,
+    borderRadius: borderRadius.md,
+    padding: 4,
+    gap: 2,
+  },
+  segment: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.sm,
+    alignItems: "center",
+  },
+  segmentActive: {
+    backgroundColor: colors.primary,
+  },
+  segmentText: {
+    fontFamily: fonts.semiBold,
+    fontSize: fontSizes.sm,
+    color: colors.textSecondary,
+  },
+  segmentTextActive: {
+    color: colors.textInverse,
   },
 });

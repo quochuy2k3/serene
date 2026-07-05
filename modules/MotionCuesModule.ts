@@ -12,6 +12,8 @@ type MotionCuesNativeModule = {
     sensitivity: number,
     dotCount: number,
     opacity: number,
+    style: string,
+    flowParams: string,
     notifTitle: string,
     notifText: string
   ) => void;
@@ -88,6 +90,8 @@ export const MotionCuesModule = {
       config.sensitivity,
       config.dotCount,
       config.opacity,
+      config.style,
+      JSON.stringify(config.flow),
       notification.title,
       notification.text
     );

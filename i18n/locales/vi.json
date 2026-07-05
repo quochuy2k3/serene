@@ -82,7 +82,12 @@
         "permissionDescription": "Serene cần quyền hiển thị chấm tròn trên các ứng dụng khác",
         "grantPermission": "Cấp quyền",
         "sensorMissing": "Thiết bị không có cảm biến chuyển động",
-        "sensorMissingDescription": "Thiết bị này không có cảm biến gia tốc tuyến tính mà overlay cần, nên các chấm tròn không thể phản hồi theo chuyển động."
+        "sensorMissingDescription": "Thiết bị này không có cảm biến gia tốc tuyến tính mà overlay cần, nên các chấm tròn không thể phản hồi theo chuyển động.",
+        "styleTitle": "Kiểu chuyển động",
+        "styleRegular": "Thường",
+        "styleDynamic": "Động",
+        "styleRegularDescription": "Các chấm dịch theo hướng chuyển động rồi trở về vị trí cũ. Nhẹ nhàng và dễ đoán.",
+        "styleDynamicDescription": "Một trường các chấm trôi dọc theo mép màn hình khi xe tăng tốc, phanh hoặc rẽ — khớp với chuyển động cơ thể bạn cảm nhận."
       }
     },
     "ios": {

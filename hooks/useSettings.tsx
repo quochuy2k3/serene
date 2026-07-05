@@ -8,7 +8,12 @@ import {
   type ReactNode,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { DotSize, DotDensity, Sensitivity } from "@/constants/config";
+import type {
+  DotSize,
+  DotDensity,
+  Sensitivity,
+  MotionStyle,
+} from "@/constants/config";
 import { MOTION_CUES_CONFIG } from "@/constants/config";
 
 const STORAGE_KEY = "serene_settings";
@@ -18,6 +23,7 @@ export type Settings = {
   dotDensity: DotDensity;
   dotOpacity: number;
   sensitivity: Sensitivity;
+  motionStyle: MotionStyle;
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -25,6 +31,7 @@ const DEFAULT_SETTINGS: Settings = {
   dotDensity: MOTION_CUES_CONFIG.defaultDotDensity,
   dotOpacity: MOTION_CUES_CONFIG.defaultOpacity,
   sensitivity: MOTION_CUES_CONFIG.defaultSensitivity,
+  motionStyle: MOTION_CUES_CONFIG.defaultMotionStyle,
 };
 
 type SettingsContextValue = {

@@ -154,6 +154,7 @@ export function useMotionCues() {
     settings.dotDensity,
     settings.sensitivity,
     settings.dotOpacity,
+    settings.motionStyle,
   ]);
 
   // iOS: toggle in-app overlay
