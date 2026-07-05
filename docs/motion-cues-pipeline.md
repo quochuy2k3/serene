@@ -23,7 +23,7 @@ flowchart TD
 
     OC --> P{Platform?}
 
-    P -->|Android| AND["Native Foreground Service<br/>MotionCuesService.kt<br/>system-wide overlay"]
+    P -->|Android| AND["Native Foreground Service<br/>MotionOffsetService.kt<br/>system-wide overlay"]
     P -->|iOS| IOS["In-app Reanimated overlay<br/>MotionDotsOverlay.tsx<br/>in-app only"]
 
     SENSA["LINEAR_ACCELERATION sensor<br/>(gravity removed)"] --> AND
@@ -131,7 +131,7 @@ sequenceDiagram
     participant UI as Settings/Control (JS)
     participant Hook as useMotionCues
     participant Bridge as MotionCuesModule
-    participant Svc as MotionCuesService (native)
+    participant Svc as MotionOffsetService (native)
 
     UI->>Hook: startOverlay()
     Hook->>Bridge: startOverlay(config, localizedNotif)
@@ -155,7 +155,7 @@ sequenceDiagram
     Note over UI,Svc: user reopens app
     UI->>Hook: AppState → active
     Hook->>Bridge: isOverlayActive()
-    Bridge-->>Hook: MotionCuesService.isRunning
+    Bridge-->>Hook: MotionOffsetService.isRunning
     Hook->>UI: setIsActive(real state)  %% no stale "off"
 ```
 
@@ -245,5 +245,5 @@ match); Y is kept positive so forward acceleration pushes dots down.
 | Lifecycle + state sync | `hooks/useMotionCues.ts` |
 | JS bridge | `modules/MotionCuesModule.ts` |
 | Native bridge | `plugins/motion-cues-native/java/MotionCuesModule.kt` |
-| Native service (core loop) | `plugins/motion-cues-native/java/MotionCuesService.kt` |
+| Native service (core loop) | `plugins/motion-cues-native/java/MotionOffsetService.kt` |
 | iOS overlay | `components/MotionDotsOverlay.tsx` |

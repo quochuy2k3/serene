@@ -46,7 +46,7 @@ Inspired by Apple's **Vehicle Motion Cues** (iOS 18). Eight animated dots sit at
 - **Fonts:** Manrope (`@expo-google-fonts/manrope`)
 - **Animation:** react-native-reanimated v4
 - **Audio:** expo-audio (pre-rendered 100 Hz WAV)
-- **Android native:** Kotlin (`MotionCuesService`, `MotionCuesModule`) via an Expo config plugin
+- **Android native:** Kotlin (`MotionOffsetService`, `MotionCuesModule`) via an Expo config plugin
 
 ## Project Structure
 

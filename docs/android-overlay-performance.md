@@ -9,7 +9,7 @@ How the Android overlay went from "freezes/kills Google & system apps" to smooth
 
 ## Root cause: WindowManager relayout storm
 
-The original `MotionCuesService` created **8 separate overlay windows** (one `View` per dot) and moved them on **every sensor event**:
+The original `MotionOffsetService` created **8 separate overlay windows** (one `View` per dot) and moved them on **every sensor event**:
 
 ```kotlin
 // onSensorChanged, fired at SENSOR_DELAY_GAME (~200 Hz)
@@ -84,7 +84,7 @@ Key idea: **`updateViewLayout` is global and expensive; `View.onDraw` is local a
 
 ## Files
 
-- `plugins/motion-cues-native/java/MotionCuesService.kt` — the rewrite (source of truth; copied into `android/` by the config plugin).
+- `plugins/motion-cues-native/java/MotionOffsetService.kt` — the rewrite (source of truth; copied into `android/` by the config plugin).
 
 ## Build / reproduce
 
@@ -98,8 +98,8 @@ npx expo run:android                           # builds + installs the dev-clien
 After editing the Kotlin source, either re-run `prebuild` or copy the file into the generated tree and rebuild:
 
 ```bash
-cp plugins/motion-cues-native/java/MotionCuesService.kt \
-   android/app/src/main/java/com/serene/app/MotionCuesService.kt
+cp plugins/motion-cues-native/java/MotionOffsetService.kt \
+   android/app/src/main/java/com/serene/app/MotionOffsetService.kt
 ./android/gradlew -p android assembleDebug
 adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 ```

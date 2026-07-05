@@ -16,7 +16,7 @@ Free, non-profit app for iOS + Android. Package: `com.serene.app`.
 - **Fonts:** Manrope (via @expo-google-fonts/manrope)
 - **Animation:** react-native-reanimated v4 (iOS dots)
 - **Audio:** expo-audio (pre-rendered 100 Hz sine WAV)
-- **Android native:** Kotlin (MotionCuesService, MotionCuesModule)
+- **Android native:** Kotlin (MotionOffsetService, MotionCuesModule)
 
 ## Architecture
 
@@ -89,7 +89,7 @@ ios/              → Native iOS code (after prebuild)
 - iOS requires a user tap gesture to start playback (UX enforces tap before play)
 
 ### Motion Cues Overlay (Android)
-- Native Foreground Service (`MotionCuesService.kt`)
+- Native Foreground Service (`MotionOffsetService.kt`)
 - `TYPE_APPLICATION_OVERLAY` via WindowManager
 - `LINEAR_ACCELERATION` sensor at ~60fps
 - Dot offset: `shiftX = (-accelX * sensitivity).coerceIn(-max, max)`
