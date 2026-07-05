@@ -19,9 +19,20 @@ const PACKAGE_NAME = "com.serene.app";
 const PACKAGE_INSTANTIATION = "add(MotionCuesPackage())";
 
 const NATIVE_FILES = {
-  kotlin: ["MotionCuesService.kt", "MotionCuesModule.kt", "MotionCuesPackage.kt"],
+  kotlin: [
+    "MotionOffsetService.kt",
+    "MotionFlowService.kt",
+    "MotionCuesModule.kt",
+    "MotionCuesPackage.kt",
+  ],
   drawable: ["motion_cue_dot.xml"],
 };
+
+// Both foreground services declared in the manifest. v1 = MotionOffsetService
+// (Regular), v2 = MotionFlowService (Dynamic). The JS bridge runs one at a time.
+const SERVICE_NAMES = [".MotionOffsetService", ".MotionFlowService"];
+const FGS_SUBTYPE =
+  "Motion cues overlay displayed at screen edges to reduce motion sickness symptoms. Does not read screen content.";
 
 // --- Dangerous mod: copy native source files into android/ ---
 const withMotionCuesNativeFiles = (config) =>
@@ -104,32 +115,31 @@ const withMotionCuesManifest = (config) =>
       application.service = [];
     }
 
-    const SERVICE_NAME = ".MotionCuesService";
-    const existingIndex = application.service.findIndex(
-      (s) => s.$?.["android:name"] === SERVICE_NAME
-    );
-
-    const serviceEntry = {
-      $: {
-        "android:name": SERVICE_NAME,
-        "android:foregroundServiceType": "specialUse",
-        "android:exported": "false",
-      },
-      property: [
-        {
-          $: {
-            "android:name": "android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE",
-            "android:value":
-              "Motion cues overlay displayed at screen edges to reduce motion sickness symptoms. Does not read screen content.",
-          },
+    for (const serviceName of SERVICE_NAMES) {
+      const serviceEntry = {
+        $: {
+          "android:name": serviceName,
+          "android:foregroundServiceType": "specialUse",
+          "android:exported": "false",
         },
-      ],
-    };
+        property: [
+          {
+            $: {
+              "android:name": "android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE",
+              "android:value": FGS_SUBTYPE,
+            },
+          },
+        ],
+      };
 
-    if (existingIndex >= 0) {
-      application.service[existingIndex] = serviceEntry;
-    } else {
-      application.service.push(serviceEntry);
+      const existingIndex = application.service.findIndex(
+        (s) => s.$?.["android:name"] === serviceName
+      );
+      if (existingIndex >= 0) {
+        application.service[existingIndex] = serviceEntry;
+      } else {
+        application.service.push(serviceEntry);
+      }
     }
 
     return config;
