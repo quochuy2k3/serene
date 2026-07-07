@@ -1,16 +1,19 @@
 import { View, Text, StyleSheet, Pressable, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { useHaptics } from "@/hooks/useHaptics";
 import {
-  colors,
   fonts,
   fontSizes,
+  fontScaleCaps,
   spacing,
   letterSpacing,
   lineHeights,
+  type ThemeColors,
 } from "@/constants/theme";
+import { useTheme, useThemedStyles } from "@/hooks/useTheme";
 
 type HeaderProps = {
   eyebrow?: string;
@@ -40,6 +43,9 @@ export function Header({
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const haptics = useHaptics();
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
 
   const handleBack = () => {
     haptics.tap();
@@ -62,7 +68,7 @@ export function Header({
           hitSlop={16}
           style={styles.backButton}
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel={t("common.back")}
         >
           <View style={styles.backIconWrap}>
             <Ionicons name="chevron-back" size={22} color={colors.textPrimary} />
@@ -75,6 +81,7 @@ export function Header({
           <Text
             style={[styles.eyebrow, align === "center" && styles.textCenter]}
             numberOfLines={1}
+            maxFontSizeMultiplier={fontScaleCaps.control}
           >
             {eyebrow}
           </Text>
@@ -82,7 +89,7 @@ export function Header({
         <Text
           style={[styles.title, align === "center" && styles.textCenter]}
           numberOfLines={2}
-          allowFontScaling={false}
+          maxFontSizeMultiplier={fontScaleCaps.heading}
           adjustsFontSizeToFit
           minimumFontScale={0.85}
         >
@@ -95,6 +102,7 @@ export function Header({
               align === "center" && styles.textCenter,
             ]}
             numberOfLines={3}
+            maxFontSizeMultiplier={fontScaleCaps.body}
           >
             {description}
           </Text>
@@ -104,8 +112,9 @@ export function Header({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.lg,
     gap: spacing.sm,
@@ -133,7 +142,7 @@ const styles = StyleSheet.create({
   eyebrow: {
     fontFamily: fonts.semiBold,
     fontSize: fontSizes.xs,
-    color: colors.primary,
+    color: colors.textAccent,
     letterSpacing: letterSpacing.wide + 0.5,
     textTransform: "uppercase",
   },

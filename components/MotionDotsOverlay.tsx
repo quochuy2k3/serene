@@ -6,9 +6,12 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  ReduceMotion,
 } from "react-native-reanimated";
 import { MOTION_CUES_CONFIG } from "@/constants/config";
+import { springs } from "@/constants/theme";
 import { useSettings } from "@/hooks/useSettings";
+import { useTheme } from "@/hooks/useTheme";
 
 /**
  * 8 dot positions at the screen edges, offset by the safe-area insets so the
@@ -36,9 +39,22 @@ type MotionDotProps = {
   size: number;
   opacity: number;
   sensitivity: number;
+  color: string;
+  borderColor: string;
 };
 
-function MotionDot({ position, size, opacity, sensitivity }: MotionDotProps) {
+// The dot springs ARE the therapy — they must keep moving even when the
+// user (or OS) asks for reduced motion, hence ReduceMotion.Never.
+const DOT_SPRING = { ...springs.dot, reduceMotion: ReduceMotion.Never };
+
+function MotionDot({
+  position,
+  size,
+  opacity,
+  sensitivity,
+  color,
+  borderColor,
+}: MotionDotProps) {
   const offsetX = useSharedValue(0);
   const offsetY = useSharedValue(0);
 
@@ -46,15 +62,9 @@ function MotionDot({ position, size, opacity, sensitivity }: MotionDotProps) {
     Accelerometer.setUpdateInterval(MOTION_CUES_CONFIG.sensorUpdateInterval);
     const subscription = Accelerometer.addListener(({ x, y }) => {
       // Invert X: car turns right → dots shift left (matches Apple)
-      offsetX.value = withSpring(-x * sensitivity * 10, {
-        damping: 15,
-        stiffness: 120,
-      });
+      offsetX.value = withSpring(-x * sensitivity * 10, DOT_SPRING);
       // Positive Y: car accelerates → dots shift down
-      offsetY.value = withSpring(y * sensitivity * 10, {
-        damping: 15,
-        stiffness: 120,
-      });
+      offsetY.value = withSpring(y * sensitivity * 10, DOT_SPRING);
     });
 
     return () => {
@@ -78,6 +88,8 @@ function MotionDot({ position, size, opacity, sensitivity }: MotionDotProps) {
           height: size,
           borderRadius: size / 2,
           opacity,
+          backgroundColor: color,
+          borderColor,
         },
         position,
         animatedStyle,
@@ -93,6 +105,7 @@ type MotionDotsOverlayProps = {
 
 export function MotionDotsOverlay({ visible }: MotionDotsOverlayProps) {
   const { settings } = useSettings();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
   if (!visible) return null;
@@ -111,6 +124,8 @@ export function MotionDotsOverlay({ visible }: MotionDotsOverlayProps) {
           size={size}
           opacity={settings.dotOpacity}
           sensitivity={sensitivity}
+          color={colors.motionDot}
+          borderColor={colors.motionDotBorder}
         />
       ))}
     </View>
@@ -120,8 +135,6 @@ export function MotionDotsOverlay({ visible }: MotionDotsOverlayProps) {
 const styles = StyleSheet.create({
   dot: {
     position: "absolute",
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderWidth: 1,
-    borderColor: "rgba(0, 0, 0, 0.2)",
   },
 });

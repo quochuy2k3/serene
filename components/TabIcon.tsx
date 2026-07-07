@@ -1,6 +1,6 @@
 import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "@/constants/theme";
+import { useTheme } from "@/hooks/useTheme";
 
 export type TabIconName = "home" | "motion" | "settings";
 
@@ -17,6 +17,7 @@ const ICONS: Record<TabIconName, { active: string; inactive: string }> = {
 };
 
 export function TabIcon({ name, focused, size = 22 }: TabIconProps) {
+  const { colors } = useTheme();
   const iconName = focused ? ICONS[name].active : ICONS[name].inactive;
   const color = focused ? colors.primary : colors.textTertiary;
 

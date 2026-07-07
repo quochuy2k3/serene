@@ -8,8 +8,16 @@ import {
   TextStyle,
   StyleProp,
 } from "react-native";
-import { colors, fonts, fontSizes, spacing, borderRadius } from "@/constants/theme";
+import {
+  fonts,
+  fontSizes,
+  fontScaleCaps,
+  spacing,
+  borderRadius,
+  type ThemeColors,
+} from "@/constants/theme";
 import { useHaptics } from "@/hooks/useHaptics";
+import { useTheme, useThemedStyles } from "@/hooks/useTheme";
 
 type ButtonVariant = "primary" | "secondary" | "inverted" | "outlined" | "ghost";
 type ButtonSize = "sm" | "md" | "lg";
@@ -41,6 +49,8 @@ export function Button({
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   const haptics = useHaptics();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
 
   const handlePress = () => {
     if (haptic !== "none") {
@@ -67,7 +77,7 @@ export function Button({
 
   const spinnerColor =
     variant === "primary" || variant === "inverted"
-      ? colors.textInverse
+      ? colors.textOnPrimary
       : colors.primary;
 
   return (
@@ -86,15 +96,21 @@ export function Button({
       ) : (
         <>
           {icon}
-          <Text style={labelStyle}>{label}</Text>
+          <Text
+            style={labelStyle}
+            maxFontSizeMultiplier={fontScaleCaps.control}
+          >
+            {label}
+          </Text>
         </>
       )}
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    base: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -170,7 +186,7 @@ const styles = StyleSheet.create({
 
   // Label variants
   label_primary: {
-    color: colors.textInverse,
+    color: colors.textOnPrimary,
   },
   label_secondary: {
     color: colors.primary,

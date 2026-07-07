@@ -16,12 +16,14 @@ import Animated, {
 import { TabIcon, type TabIconName } from "./TabIcon";
 import { useHaptics } from "@/hooks/useHaptics";
 import {
-  colors,
   fonts,
   spacing,
   letterSpacing,
   shadows,
+  springs,
+  type ThemeColors,
 } from "@/constants/theme";
+import { useThemedStyles } from "@/hooks/useTheme";
 
 /**
  * Maps route name → TabIcon name. Keep in sync with app/(tabs)/ file names.
@@ -44,6 +46,7 @@ export function PillTabBar({
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
   const haptics = useHaptics();
+  const styles = useThemedStyles(createStyles);
 
   const barWidth = screenWidth - SIDE_MARGIN * 2;
   const tabWidth = barWidth / state.routes.length;
@@ -56,11 +59,7 @@ export function PillTabBar({
   useEffect(() => {
     translateX.value = withSpring(
       state.index * tabWidth + INDICATOR_PADDING,
-      {
-        damping: 18,
-        stiffness: 180,
-        mass: 0.6,
-      }
+      springs.pill
     );
   }, [state.index, tabWidth, translateX]);
 
@@ -141,7 +140,9 @@ export function PillTabBar({
               key={route.key}
               accessibilityRole="button"
               accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
+              accessibilityLabel={
+                options.tabBarAccessibilityLabel ?? String(label)
+              }
               onPress={onPress}
               onLongPress={onLongPress}
               style={[styles.tab, { width: tabWidth }]}
@@ -164,43 +165,44 @@ export function PillTabBar({
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    alignItems: "center",
-  },
-  bar: {
-    flexDirection: "row",
-    backgroundColor: colors.surface,
-    borderRadius: 999, // Pill shape
-    borderWidth: 1,
-    borderColor: colors.border,
-    position: "relative",
-    overflow: "hidden",
-    ...shadows.lg,
-  },
-  indicator: {
-    position: "absolute",
-    backgroundColor: colors.primarySoft,
-    borderRadius: 999,
-  },
-  tab: {
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2,
-  },
-  label: {
-    fontFamily: fonts.medium,
-    fontSize: 10,
-    color: colors.textTertiary,
-    letterSpacing: letterSpacing.wide,
-    textTransform: "uppercase",
-  },
-  labelActive: {
-    fontFamily: fonts.bold,
-    color: colors.primary,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    wrapper: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      alignItems: "center",
+    },
+    bar: {
+      flexDirection: "row",
+      backgroundColor: colors.surface,
+      borderRadius: 999, // Pill shape
+      borderWidth: 1,
+      borderColor: colors.border,
+      position: "relative",
+      overflow: "hidden",
+      ...shadows.lg,
+    },
+    indicator: {
+      position: "absolute",
+      backgroundColor: colors.primarySoft,
+      borderRadius: 999,
+    },
+    tab: {
+      height: "100%",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 2,
+    },
+    label: {
+      fontFamily: fonts.medium,
+      fontSize: 10,
+      color: colors.textTertiary,
+      letterSpacing: letterSpacing.wide,
+      textTransform: "uppercase",
+    },
+    labelActive: {
+      fontFamily: fonts.bold,
+      color: colors.textAccent,
+    },
+  });

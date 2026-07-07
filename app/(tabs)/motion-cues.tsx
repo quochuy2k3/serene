@@ -8,19 +8,24 @@ import {
   Linking,
   Switch,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import Animated, { FadeIn } from "react-native-reanimated";
 import {
-  colors,
   fonts,
   fontSizes,
+  fontScaleCaps,
   spacing,
   borderRadius,
   shadows,
+  motion,
+  type ThemeColors,
 } from "@/constants/theme";
 import { Button } from "@/components/Button";
 import { Header } from "@/components/Header";
+import { InlineNotice } from "@/components/InlineNotice";
 import {
   OnboardingSlides,
   type Slide,
@@ -28,6 +33,7 @@ import {
 import { DemoPhoneMockup } from "@/components/DemoPhoneMockup";
 import { useMotionCues } from "@/hooks/useMotionCues";
 import { useSettings } from "@/hooks/useSettings";
+import { useTheme, useThemedStyles } from "@/hooks/useTheme";
 import { useTabBarClearance } from "@/hooks/useTabBarClearance";
 import type { MotionStyle } from "@/constants/config";
 
@@ -37,13 +43,20 @@ import type { MotionStyle } from "@/constants/config";
 
 function AndroidSlide1Demo() {
   const { t } = useTranslation();
+  const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <View style={slideStyles.center}>
       <DemoPhoneMockup />
-      <Text style={slideStyles.heading}>
+      <Text
+        style={slideStyles.heading}
+        maxFontSizeMultiplier={fontScaleCaps.heading}
+      >
         {t("motionCues.android.onboarding.slide1Title")}
       </Text>
-      <Text style={slideStyles.caption}>
+      <Text
+        style={slideStyles.caption}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
         {t("motionCues.android.onboarding.slide1Caption")}
       </Text>
     </View>
@@ -52,12 +65,17 @@ function AndroidSlide1Demo() {
 
 function AndroidSlide2Explanation() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <View style={slideStyles.center}>
       <View style={slideStyles.iconBadge}>
         <Ionicons name="sync-outline" size={40} color={colors.primary} />
       </View>
-      <Text style={slideStyles.heading}>
+      <Text
+        style={slideStyles.heading}
+        maxFontSizeMultiplier={fontScaleCaps.heading}
+      >
         {t("motionCues.android.onboarding.slide2Title")}
       </Text>
       <View style={slideStyles.flowList}>
@@ -76,7 +94,10 @@ function AndroidSlide2Explanation() {
           text={t("motionCues.android.onboarding.slide2Brain")}
         />
       </View>
-      <Text style={slideStyles.source}>
+      <Text
+        style={slideStyles.source}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
         {t("motionCues.android.onboarding.slide2Source")}
       </Text>
     </View>
@@ -85,36 +106,76 @@ function AndroidSlide2Explanation() {
 
 function AndroidSlide3Permission() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const slideStyles = useThemedStyles(createSlideStyles);
   return (
-    <View style={slideStyles.center}>
-      <View style={slideStyles.iconBadge}>
-        <Ionicons
-          name="shield-checkmark-outline"
-          size={40}
-          color={colors.primary}
-        />
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={slideStyles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={slideStyles.centerHorizontal}>
+        <View style={slideStyles.iconBadge}>
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={40}
+            color={colors.primary}
+          />
+        </View>
+        <Text
+          style={slideStyles.heading}
+          maxFontSizeMultiplier={fontScaleCaps.heading}
+        >
+          {t("motionCues.android.onboarding.slide3Title")}
+        </Text>
       </View>
-      <Text style={slideStyles.heading}>
-        {t("motionCues.android.onboarding.slide3Title")}
-      </Text>
       <View style={slideStyles.permissionCard}>
         <View style={slideStyles.permissionHeader}>
           <Ionicons name="layers-outline" size={20} color={colors.primary} />
-          <Text style={slideStyles.permissionFeature}>
+          <Text
+            style={slideStyles.permissionFeature}
+            maxFontSizeMultiplier={fontScaleCaps.body}
+          >
             {t("motionCues.android.onboarding.slide3Feature")}
           </Text>
         </View>
-        <Text style={slideStyles.permissionReason}>
+        <Text
+          style={slideStyles.permissionReason}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
           {t("motionCues.android.onboarding.slide3Reason")}
         </Text>
       </View>
+      {/* Android 11+ opens the top-level app list, not Serene's page —
+          walk the user through finding it. */}
+      <View style={slideStyles.steps}>
+        <StepItem
+          number={1}
+          text={t("motionCues.android.onboarding.slide3Step1")}
+        />
+        <StepItem
+          number={2}
+          text={t("motionCues.android.onboarding.slide3Step2")}
+        />
+        <StepItem
+          number={3}
+          text={t("motionCues.android.onboarding.slide3Step3")}
+        />
+        <StepItem
+          number={4}
+          text={t("motionCues.android.onboarding.slide3Step4")}
+        />
+      </View>
       <View style={slideStyles.privacyRow}>
         <Ionicons name="lock-closed-outline" size={14} color={colors.primary} />
-        <Text style={slideStyles.privacy}>
+        <Text
+          style={slideStyles.privacy}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
           {t("motionCues.android.onboarding.slide3Privacy")}
         </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -124,18 +185,29 @@ function AndroidSlide3Permission() {
 
 function IOSSlide1Intro() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <View style={slideStyles.center}>
       <View style={slideStyles.iconBadge}>
         <Ionicons name="logo-apple" size={44} color={colors.textPrimary} />
       </View>
-      <Text style={slideStyles.heading}>
+      <Text
+        style={slideStyles.heading}
+        maxFontSizeMultiplier={fontScaleCaps.heading}
+      >
         {t("motionCues.ios.onboarding.slide1Title")}
       </Text>
-      <Text style={slideStyles.subtitle}>
+      <Text
+        style={slideStyles.subtitle}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
         {t("motionCues.ios.onboarding.slide1Subtitle")}
       </Text>
-      <Text style={slideStyles.caption}>
+      <Text
+        style={slideStyles.caption}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
         {t("motionCues.ios.onboarding.slide1Description")}
       </Text>
     </View>
@@ -144,13 +216,18 @@ function IOSSlide1Intro() {
 
 function IOSSlide2Guide() {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <ScrollView
       style={{ flex: 1 }}
       contentContainerStyle={slideStyles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={slideStyles.heading}>
+      <Text
+        style={slideStyles.heading}
+        maxFontSizeMultiplier={fontScaleCaps.heading}
+      >
         {t("motionCues.ios.onboarding.slide2Title")}
       </Text>
       <View style={slideStyles.steps}>
@@ -177,7 +254,10 @@ function IOSSlide2Guide() {
           size={14}
           color={colors.textTertiary}
         />
-        <Text style={slideStyles.tip}>
+        <Text
+          style={slideStyles.tip}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
           {t("motionCues.ios.onboarding.slide2Tip")}
         </Text>
       </View>
@@ -185,8 +265,10 @@ function IOSSlide2Guide() {
   );
 }
 
-function IOSSlide3DeepLink() {
+function IOSSlide3DeepLink({ linkFailed }: { linkFailed: boolean }) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <View style={slideStyles.center}>
       <View style={slideStyles.iconBadge}>
@@ -196,12 +278,25 @@ function IOSSlide3DeepLink() {
           color={colors.primary}
         />
       </View>
-      <Text style={slideStyles.heading}>
+      <Text
+        style={slideStyles.heading}
+        maxFontSizeMultiplier={fontScaleCaps.heading}
+      >
         {t("motionCues.ios.onboarding.slide3Title")}
       </Text>
-      <Text style={slideStyles.subtitle}>
+      <Text
+        style={slideStyles.subtitle}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
         {t("motionCues.ios.onboarding.slide3Subtitle")}
       </Text>
+      {linkFailed && (
+        <InlineNotice
+          variant="warning"
+          message={t("motionCues.ios.control.openSettingsFailed")}
+          title={t("motionCues.ios.control.openSettingsFallback")}
+        />
+      )}
     </View>
   );
 }
@@ -217,41 +312,61 @@ function FlowItem({
   icon: keyof typeof Ionicons.glyphMap;
   text: string;
 }) {
+  const { colors } = useTheme();
+  const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <View style={slideStyles.flowItem}>
       <View style={slideStyles.flowIconBox}>
         <Ionicons name={icon} size={18} color={colors.primary} />
       </View>
-      <Text style={slideStyles.flowText}>{text}</Text>
+      <Text
+        style={slideStyles.flowText}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
+        {text}
+      </Text>
     </View>
   );
 }
 
 function StepItem({ number, text }: { number: number; text: string }) {
+  const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <View style={slideStyles.stepItem}>
       <View style={slideStyles.stepNumber}>
-        <Text style={slideStyles.stepNumberText}>{number}</Text>
+        <Text
+          style={slideStyles.stepNumberText}
+          maxFontSizeMultiplier={fontScaleCaps.control}
+        >
+          {number}
+        </Text>
       </View>
-      <Text style={slideStyles.stepText}>{text}</Text>
+      <Text
+        style={slideStyles.stepText}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
+        {text}
+      </Text>
     </View>
   );
 }
 
-async function openAccessibilitySettings(): Promise<void> {
+/** Returns true if a settings screen was opened. */
+async function openAccessibilitySettings(): Promise<boolean> {
   try {
     const supported = await Linking.canOpenURL("App-prefs:Accessibility");
     if (supported) {
       await Linking.openURL("App-prefs:Accessibility");
-      return;
+      return true;
     }
   } catch {
-    // Fall through
+    // Fall through to the app-settings fallback
   }
   try {
     await Linking.openURL("app-settings:");
+    return true;
   } catch {
-    // Ignore
+    return false;
   }
 }
 
@@ -280,15 +395,19 @@ function MotionStylePicker({
   onChange: (style: MotionStyle) => void;
 }) {
   const { t } = useTranslation();
+  const controlStyles = useThemedStyles(createControlStyles);
   const activeDescKey = MOTION_STYLE_OPTIONS.find((o) => o.value === value)
     ?.descKey;
 
   return (
     <View style={controlStyles.card}>
-      <Text style={controlStyles.cardTitle}>
+      <Text
+        style={controlStyles.cardTitle}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
         {t("motionCues.android.control.styleTitle")}
       </Text>
-      <View style={controlStyles.segmented}>
+      <View style={controlStyles.segmented} accessibilityRole="radiogroup">
         {MOTION_STYLE_OPTIONS.map(({ value: v, labelKey }) => {
           const active = value === v;
           return (
@@ -299,12 +418,16 @@ function MotionStylePicker({
                 controlStyles.segment,
                 active && controlStyles.segmentActive,
               ]}
+              accessibilityRole="radio"
+              accessibilityLabel={t(labelKey)}
+              accessibilityState={{ checked: active }}
             >
               <Text
                 style={[
                   controlStyles.segmentText,
                   active && controlStyles.segmentTextActive,
                 ]}
+                maxFontSizeMultiplier={fontScaleCaps.control}
               >
                 {t(labelKey)}
               </Text>
@@ -313,7 +436,12 @@ function MotionStylePicker({
         })}
       </View>
       {activeDescKey && (
-        <Text style={controlStyles.cardDescription}>{t(activeDescKey)}</Text>
+        <Text
+          style={controlStyles.cardDescription}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
+          {t(activeDescKey)}
+        </Text>
       )}
     </View>
   );
@@ -330,6 +458,8 @@ function AndroidControlScreen({
 }) {
   const { t } = useTranslation();
   const tabBarClearance = useTabBarClearance();
+  const { colors } = useTheme();
+  const controlStyles = useThemedStyles(createControlStyles);
   const {
     hasPermission,
     hasMotionSensor,
@@ -337,8 +467,22 @@ function AndroidControlScreen({
     startOverlay,
     stopOverlay,
     requestAndroidPermission,
+    persistError,
+    clearPersistError,
   } = useMotionCues();
   const { settings, updateSettings } = useSettings();
+
+  // Set once the user has been sent to the system settings list —
+  // if they come back still without the permission, show the walk-through
+  // instead of the generic ask.
+  const [hasRequested, setHasRequested] = useState(false);
+
+  const handleGrant = async () => {
+    setHasRequested(true);
+    await requestAndroidPermission();
+  };
+
+  const showDenied = hasRequested && !hasPermission;
 
   return (
     <ScrollView
@@ -348,6 +492,19 @@ function AndroidControlScreen({
         { paddingBottom: tabBarClearance },
       ]}
     >
+      {persistError && (
+        <InlineNotice
+          variant="warning"
+          message={
+            persistError === "load"
+              ? t("errors.storageLoad")
+              : t("errors.storageSave")
+          }
+          dismissLabel={t("common.done")}
+          onDismiss={clearPersistError}
+        />
+      )}
+
       <View
         style={[
           controlStyles.statusCard,
@@ -361,13 +518,19 @@ function AndroidControlScreen({
               { backgroundColor: isActive ? colors.success : colors.secondary },
             ]}
           />
-          <Text style={controlStyles.statusText}>
+          <Text
+            style={controlStyles.statusText}
+            maxFontSizeMultiplier={fontScaleCaps.body}
+          >
             {isActive
               ? t("motionCues.android.control.active")
               : t("motionCues.android.control.inactive")}
           </Text>
         </View>
-        <Text style={controlStyles.statusDescription}>
+        <Text
+          style={controlStyles.statusDescription}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
           {isActive
             ? t("motionCues.android.control.activeDescription")
             : t("motionCues.android.control.inactiveDescription")}
@@ -376,10 +539,16 @@ function AndroidControlScreen({
 
       {!hasMotionSensor && (
         <View style={controlStyles.warningCard}>
-          <Text style={controlStyles.warningTitle}>
+          <Text
+            style={controlStyles.warningTitle}
+            maxFontSizeMultiplier={fontScaleCaps.body}
+          >
             {t("motionCues.android.control.sensorMissing")}
           </Text>
-          <Text style={controlStyles.warningText}>
+          <Text
+            style={controlStyles.warningText}
+            maxFontSizeMultiplier={fontScaleCaps.body}
+          >
             {t("motionCues.android.control.sensorMissingDescription")}
           </Text>
         </View>
@@ -387,15 +556,29 @@ function AndroidControlScreen({
 
       {hasMotionSensor && !hasPermission && (
         <View style={controlStyles.warningCard}>
-          <Text style={controlStyles.warningTitle}>
-            {t("motionCues.android.control.permissionRequired")}
+          <Text
+            style={controlStyles.warningTitle}
+            maxFontSizeMultiplier={fontScaleCaps.body}
+          >
+            {showDenied
+              ? t("motionCues.android.control.deniedTitle")
+              : t("motionCues.android.control.permissionRequired")}
           </Text>
-          <Text style={controlStyles.warningText}>
-            {t("motionCues.android.control.permissionDescription")}
+          <Text
+            style={controlStyles.warningText}
+            maxFontSizeMultiplier={fontScaleCaps.body}
+          >
+            {showDenied
+              ? t("motionCues.android.control.deniedDescription")
+              : t("motionCues.android.control.permissionDescription")}
           </Text>
           <Button
-            label={t("motionCues.android.control.grantPermission")}
-            onPress={requestAndroidPermission}
+            label={
+              showDenied
+                ? t("motionCues.android.control.reopenSettings")
+                : t("motionCues.android.control.grantPermission")
+            }
+            onPress={handleGrant}
             variant="primary"
             size="md"
             fullWidth
@@ -429,7 +612,10 @@ function AndroidControlScreen({
         )}
       </View>
 
-      <Text style={controlStyles.description}>
+      <Text
+        style={controlStyles.description}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
         {t("motionCues.howItWorks")}
       </Text>
 
@@ -455,17 +641,27 @@ function IOSControlScreen({
 }) {
   const { t } = useTranslation();
   const tabBarClearance = useTabBarClearance();
+  const { colors } = useTheme();
+  const controlStyles = useThemedStyles(createControlStyles);
   const {
     iosOverlayEnabled,
     iosAppleCuesConfirmed,
     toggleIOSOverlay,
+    persistError,
+    clearPersistError,
   } = useMotionCues();
+  const [linkFailed, setLinkFailed] = useState(false);
 
   const iosMajor =
     Platform.OS === "ios"
       ? parseInt(String(Platform.Version).split(".")[0] ?? "0", 10)
       : 0;
   const isUnsupported = Platform.OS === "ios" && iosMajor < 18;
+
+  const handleOpenSettings = async () => {
+    const opened = await openAccessibilitySettings();
+    setLinkFailed(!opened);
+  };
 
   return (
     <ScrollView
@@ -475,50 +671,99 @@ function IOSControlScreen({
         { paddingBottom: tabBarClearance },
       ]}
     >
+      {persistError && (
+        <InlineNotice
+          variant="warning"
+          message={
+            persistError === "load"
+              ? t("errors.storageLoad")
+              : t("errors.storageSave")
+          }
+          dismissLabel={t("common.done")}
+          onDismiss={clearPersistError}
+        />
+      )}
+
       {isUnsupported && (
         <View style={controlStyles.warningCard}>
-          <Text style={controlStyles.warningText}>
+          <Text
+            style={controlStyles.warningText}
+            maxFontSizeMultiplier={fontScaleCaps.body}
+          >
             {t("motionCues.ios.control.unsupportedVersion")}
           </Text>
         </View>
       )}
 
       <View style={controlStyles.card}>
-        <Text style={controlStyles.cardTitle}>
-          🍎 {t("motionCues.ios.control.appleCues")}
-        </Text>
-        {iosAppleCuesConfirmed && (
-          <Text style={controlStyles.cardStatus}>
-            ✓ {t("motionCues.ios.control.appleCuesEnabled")}
+        <View style={controlStyles.cardTitleRow}>
+          <Ionicons name="logo-apple" size={18} color={colors.textPrimary} />
+          <Text
+            style={controlStyles.cardTitle}
+            maxFontSizeMultiplier={fontScaleCaps.body}
+          >
+            {t("motionCues.ios.control.appleCues")}
           </Text>
+        </View>
+        {iosAppleCuesConfirmed && (
+          <View style={controlStyles.cardStatusRow}>
+            <Ionicons
+              name="checkmark-circle"
+              size={16}
+              color={colors.success}
+            />
+            <Text
+              style={controlStyles.cardStatus}
+              maxFontSizeMultiplier={fontScaleCaps.body}
+            >
+              {t("motionCues.ios.control.appleCuesEnabled")}
+            </Text>
+          </View>
         )}
-        <Text style={controlStyles.cardDescription}>
+        <Text
+          style={controlStyles.cardDescription}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
           {t("motionCues.ios.control.appleCuesDescription")}
         </Text>
         <Button
           label={t("motionCues.ios.control.openSettings")}
-          onPress={openAccessibilitySettings}
+          onPress={handleOpenSettings}
           variant="outlined"
           size="md"
           fullWidth
         />
+        {linkFailed && (
+          <InlineNotice
+            variant="warning"
+            message={t("motionCues.ios.control.openSettingsFailed")}
+            title={t("motionCues.ios.control.openSettingsFallback")}
+          />
+        )}
       </View>
 
       <View style={controlStyles.card}>
         <View style={controlStyles.cardHeader}>
           <View style={{ flex: 1 }}>
-            <Text style={controlStyles.cardTitle}>
+            <Text
+              style={controlStyles.cardTitle}
+              maxFontSizeMultiplier={fontScaleCaps.body}
+            >
               {t("motionCues.ios.control.inAppOverlay")}
             </Text>
-            <Text style={controlStyles.cardDescription}>
+            <Text
+              style={controlStyles.cardDescription}
+              maxFontSizeMultiplier={fontScaleCaps.body}
+            >
               {t("motionCues.ios.control.inAppDescription")}
             </Text>
           </View>
           <Switch
             value={iosOverlayEnabled}
             onValueChange={toggleIOSOverlay}
-            trackColor={{ false: colors.neutralDark, true: colors.primary }}
+            trackColor={{ false: colors.sliderTrack, true: colors.primary }}
             thumbColor={colors.white}
+            accessibilityLabel={t("motionCues.ios.control.inAppOverlay")}
           />
         </View>
       </View>
@@ -540,6 +785,8 @@ function IOSControlScreen({
 
 export default function MotionCuesScreen() {
   const { t } = useTranslation();
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useTheme();
   const {
     isFirstTime,
     completeOnboarding,
@@ -549,6 +796,7 @@ export default function MotionCuesScreen() {
   } = useMotionCues();
 
   const [forceOnboarding, setForceOnboarding] = useState(false);
+  const [slideLinkFailed, setSlideLinkFailed] = useState(false);
 
   const showOnboarding = isFirstTime === true || forceOnboarding;
 
@@ -563,7 +811,13 @@ export default function MotionCuesScreen() {
   }, [resetOnboarding]);
 
   if (isFirstTime === null) {
-    return <View style={styles.container} />;
+    return (
+      <View style={[styles.container, styles.loading]}>
+        <Animated.View entering={FadeIn.delay(150).duration(motion.quick)}>
+          <ActivityIndicator color={colors.primary} />
+        </Animated.View>
+      </View>
+    );
   }
 
   if (showOnboarding) {
@@ -599,6 +853,8 @@ export default function MotionCuesScreen() {
               secondaryCta: {
                 label: t("motionCues.android.onboarding.slide3Later"),
                 onPress: handleComplete,
+                variant: "outlined",
+                size: "lg",
               },
             },
           ]
@@ -621,11 +877,12 @@ export default function MotionCuesScreen() {
             },
             {
               key: "i3",
-              render: () => <IOSSlide3DeepLink />,
+              render: () => <IOSSlide3DeepLink linkFailed={slideLinkFailed} />,
               primaryCta: {
                 label: t("motionCues.ios.onboarding.slide3Cta"),
                 onPress: async () => {
-                  await openAccessibilitySettings();
+                  const opened = await openAccessibilitySettings();
+                  setSlideLinkFailed(!opened);
                 },
               },
               secondaryCta: {
@@ -671,296 +928,319 @@ export default function MotionCuesScreen() {
 // Styles
 // ============================================================
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    loading: {
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  });
 
-const slideStyles = StyleSheet.create({
-  center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: spacing.md,
-  },
-  scrollContent: {
-    paddingVertical: spacing.md,
-    gap: spacing.md,
-  },
-  heading: {
-    fontFamily: fonts.bold,
-    fontSize: fontSizes["2xl"],
-    color: colors.textPrimary,
-    textAlign: "center",
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    fontFamily: fonts.medium,
-    fontSize: fontSizes.md,
-    color: colors.primary,
-    textAlign: "center",
-  },
-  caption: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.md,
-    color: colors.textSecondary,
-    textAlign: "center",
-    lineHeight: 22,
-    paddingHorizontal: spacing.md,
-  },
-  iconBadge: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primarySoft,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: spacing.sm,
-  },
-  flowList: {
-    alignItems: "center",
-    marginVertical: spacing.md,
-    gap: spacing.xs,
-  },
-  flowItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    backgroundColor: colors.surface,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
-    borderRadius: borderRadius.md,
-    minWidth: 260,
-    ...shadows.xs,
-  },
-  flowIconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.primarySoft,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  flowText: {
-    fontFamily: fonts.medium,
-    fontSize: fontSizes.md,
-    color: colors.textPrimary,
-    flex: 1,
-  },
-  flowArrow: {
-    width: 2,
-    height: 18,
-    backgroundColor: colors.secondary,
-    marginVertical: 2,
-  },
-  source: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.xs,
-    color: colors.textSecondary,
-    textAlign: "center",
-    marginTop: spacing.md,
-    fontStyle: "italic",
-  },
-  permissionCard: {
-    backgroundColor: colors.surface,
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.primary,
-    width: "100%",
-    ...shadows.sm,
-  },
-  permissionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  permissionFeature: {
-    fontFamily: fonts.bold,
-    fontSize: fontSizes.md,
-    color: colors.textPrimary,
-  },
-  permissionReason: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-  privacyRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: spacing.sm,
-    paddingHorizontal: spacing.md,
-  },
-  privacy: {
-    fontFamily: fonts.medium,
-    fontSize: fontSizes.sm,
-    color: colors.primary,
-    textAlign: "center",
-    flex: 1,
-  },
-  steps: {
-    gap: spacing.md,
-    marginVertical: spacing.lg,
-  },
-  stepItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  stepNumber: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepNumberText: {
-    fontFamily: fonts.bold,
-    fontSize: fontSizes.md,
-    color: colors.textInverse,
-  },
-  stepText: {
-    fontFamily: fonts.medium,
-    fontSize: fontSizes.md,
-    color: colors.textPrimary,
-    flex: 1,
-  },
-  tipRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginTop: spacing.md,
-    paddingHorizontal: spacing.md,
-  },
-  tip: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    flex: 1,
-  },
-});
+const createSlideStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    center: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.md,
+    },
+    centerHorizontal: {
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    scrollContent: {
+      paddingVertical: spacing.md,
+      gap: spacing.md,
+    },
+    heading: {
+      fontFamily: fonts.bold,
+      fontSize: fontSizes["2xl"],
+      color: colors.textPrimary,
+      textAlign: "center",
+      marginBottom: spacing.xs,
+    },
+    subtitle: {
+      fontFamily: fonts.medium,
+      fontSize: fontSizes.md,
+      color: colors.textAccent,
+      textAlign: "center",
+    },
+    caption: {
+      fontFamily: fonts.regular,
+      fontSize: fontSizes.md,
+      color: colors.textSecondary,
+      textAlign: "center",
+      lineHeight: 22,
+      paddingHorizontal: spacing.md,
+    },
+    iconBadge: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.primarySoft,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: spacing.sm,
+    },
+    flowList: {
+      alignItems: "center",
+      marginVertical: spacing.md,
+      gap: spacing.xs,
+    },
+    flowItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+      backgroundColor: colors.surface,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.md,
+      borderRadius: borderRadius.md,
+      minWidth: 260,
+      ...shadows.xs,
+    },
+    flowIconBox: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.primarySoft,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    flowText: {
+      fontFamily: fonts.medium,
+      fontSize: fontSizes.md,
+      color: colors.textPrimary,
+      flex: 1,
+    },
+    flowArrow: {
+      width: 2,
+      height: 18,
+      backgroundColor: colors.secondary,
+      marginVertical: 2,
+    },
+    source: {
+      fontFamily: fonts.regular,
+      fontSize: fontSizes.xs,
+      color: colors.textSecondary,
+      textAlign: "center",
+      marginTop: spacing.md,
+      fontStyle: "italic",
+    },
+    permissionCard: {
+      backgroundColor: colors.surface,
+      padding: spacing.lg,
+      borderRadius: borderRadius.lg,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.primary,
+      width: "100%",
+      ...shadows.sm,
+    },
+    permissionHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    permissionFeature: {
+      fontFamily: fonts.bold,
+      fontSize: fontSizes.md,
+      color: colors.textPrimary,
+    },
+    permissionReason: {
+      fontFamily: fonts.regular,
+      fontSize: fontSizes.sm,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    privacyRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginTop: spacing.sm,
+      paddingHorizontal: spacing.md,
+    },
+    privacy: {
+      fontFamily: fonts.medium,
+      fontSize: fontSizes.sm,
+      color: colors.textAccent,
+      textAlign: "center",
+      flex: 1,
+    },
+    steps: {
+      gap: spacing.md,
+      marginVertical: spacing.lg,
+    },
+    stepItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    stepNumber: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    stepNumberText: {
+      fontFamily: fonts.bold,
+      fontSize: fontSizes.md,
+      color: colors.textOnPrimary,
+    },
+    stepText: {
+      fontFamily: fonts.medium,
+      fontSize: fontSizes.md,
+      color: colors.textPrimary,
+      flex: 1,
+    },
+    tipRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginTop: spacing.md,
+      paddingHorizontal: spacing.md,
+    },
+    tip: {
+      fontFamily: fonts.regular,
+      fontSize: fontSizes.sm,
+      color: colors.textSecondary,
+      flex: 1,
+    },
+  });
 
-const controlStyles = StyleSheet.create({
-  scroll: {
-    paddingHorizontal: spacing.xl,
-    gap: spacing.md,
-  },
-  statusCard: {
-    backgroundColor: colors.surface,
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    ...shadows.sm,
-  },
-  statusCardActive: {
-    borderLeftWidth: 4,
-    borderLeftColor: colors.success,
-  },
-  statusRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    marginBottom: spacing.xs,
-  },
-  statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  statusText: {
-    fontFamily: fonts.semiBold,
-    fontSize: fontSizes.lg,
-    color: colors.textPrimary,
-  },
-  statusDescription: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-  },
-  warningCard: {
-    backgroundColor: colors.warningSoft,
-    padding: spacing.lg,
-    borderRadius: borderRadius.md,
-    gap: spacing.sm,
-  },
-  warningTitle: {
-    fontFamily: fonts.semiBold,
-    fontSize: fontSizes.md,
-    color: colors.warning,
-  },
-  warningText: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    lineHeight: 20,
-  },
-  actionButton: {
-    marginTop: spacing.sm,
-  },
-  description: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    lineHeight: 22,
-    marginTop: spacing.md,
-    paddingHorizontal: spacing.sm,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    padding: spacing.lg,
-    borderRadius: borderRadius.lg,
-    gap: spacing.sm,
-    ...shadows.sm,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  cardTitle: {
-    fontFamily: fonts.semiBold,
-    fontSize: fontSizes.lg,
-    color: colors.textPrimary,
-  },
-  cardStatus: {
-    fontFamily: fonts.medium,
-    fontSize: fontSizes.sm,
-    color: colors.success,
-  },
-  cardDescription: {
-    fontFamily: fonts.regular,
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    lineHeight: 20,
-    marginBottom: spacing.xs,
-  },
-  segmented: {
-    flexDirection: "row",
-    backgroundColor: colors.neutral,
-    borderRadius: borderRadius.md,
-    padding: 4,
-    gap: 2,
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.sm,
-    alignItems: "center",
-  },
-  segmentActive: {
-    backgroundColor: colors.primary,
-  },
-  segmentText: {
-    fontFamily: fonts.semiBold,
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-  },
-  segmentTextActive: {
-    color: colors.textInverse,
-  },
-});
+const createControlStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    scroll: {
+      paddingHorizontal: spacing.xl,
+      gap: spacing.md,
+    },
+    statusCard: {
+      backgroundColor: colors.surface,
+      padding: spacing.lg,
+      borderRadius: borderRadius.lg,
+      ...shadows.sm,
+    },
+    statusCardActive: {
+      borderLeftWidth: 4,
+      borderLeftColor: colors.success,
+    },
+    statusRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      marginBottom: spacing.xs,
+    },
+    statusDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+    },
+    statusText: {
+      fontFamily: fonts.semiBold,
+      fontSize: fontSizes.lg,
+      color: colors.textPrimary,
+    },
+    statusDescription: {
+      fontFamily: fonts.regular,
+      fontSize: fontSizes.sm,
+      color: colors.textSecondary,
+    },
+    warningCard: {
+      backgroundColor: colors.warningSoft,
+      padding: spacing.lg,
+      borderRadius: borderRadius.md,
+      gap: spacing.sm,
+    },
+    warningTitle: {
+      fontFamily: fonts.semiBold,
+      fontSize: fontSizes.md,
+      color: colors.warning,
+    },
+    warningText: {
+      fontFamily: fonts.regular,
+      fontSize: fontSizes.sm,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    actionButton: {
+      marginTop: spacing.sm,
+    },
+    description: {
+      fontFamily: fonts.regular,
+      fontSize: fontSizes.sm,
+      color: colors.textSecondary,
+      lineHeight: 22,
+      marginTop: spacing.md,
+      paddingHorizontal: spacing.sm,
+    },
+    card: {
+      backgroundColor: colors.surface,
+      padding: spacing.lg,
+      borderRadius: borderRadius.lg,
+      gap: spacing.sm,
+      ...shadows.sm,
+    },
+    cardHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    cardTitleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+    cardTitle: {
+      fontFamily: fonts.semiBold,
+      fontSize: fontSizes.lg,
+      color: colors.textPrimary,
+    },
+    cardStatusRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    cardStatus: {
+      fontFamily: fonts.medium,
+      fontSize: fontSizes.sm,
+      color: colors.success,
+    },
+    cardDescription: {
+      fontFamily: fonts.regular,
+      fontSize: fontSizes.sm,
+      color: colors.textSecondary,
+      lineHeight: 20,
+      marginBottom: spacing.xs,
+    },
+    segmented: {
+      flexDirection: "row",
+      backgroundColor: colors.surfaceTinted,
+      borderRadius: borderRadius.md,
+      padding: 4,
+      gap: 2,
+    },
+    segment: {
+      flex: 1,
+      minHeight: 48,
+      paddingVertical: spacing.sm,
+      borderRadius: borderRadius.sm,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    segmentActive: {
+      backgroundColor: colors.primary,
+    },
+    segmentText: {
+      fontFamily: fonts.semiBold,
+      fontSize: fontSizes.sm,
+      color: colors.textSecondary,
+    },
+    segmentTextActive: {
+      color: colors.textOnPrimary,
+    },
+  });

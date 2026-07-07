@@ -9,7 +9,11 @@ import Animated, {
   withDelay,
   Easing,
 } from "react-native-reanimated";
-import { colors, borderRadius, shadows } from "@/constants/theme";
+import { palettes, borderRadius, shadows } from "@/constants/theme";
+
+// The mockup is an illustration of a phone — it intentionally keeps the
+// light-scheme colors in both themes so the demo reads the same everywhere.
+const illustration = palettes.light;
 
 const MOCKUP_WIDTH = 180;
 const MOCKUP_HEIGHT = 320;
@@ -113,7 +117,7 @@ const styles = StyleSheet.create({
   mockup: {
     width: MOCKUP_WIDTH,
     height: MOCKUP_HEIGHT,
-    backgroundColor: colors.textPrimary,
+    backgroundColor: illustration.textPrimary,
     borderRadius: borderRadius.lg + 8,
     padding: 8,
     ...shadows.lg,
@@ -122,27 +126,27 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     width: 60,
     height: 6,
-    backgroundColor: colors.neutralDark,
+    backgroundColor: illustration.borderStrong,
     borderRadius: 3,
     marginTop: 4,
     marginBottom: 10,
   },
   content: {
     flex: 1,
-    backgroundColor: colors.neutral,
+    backgroundColor: illustration.surfaceTinted,
     borderRadius: borderRadius.md,
     padding: 14,
     gap: 10,
   },
   contentBar: {
     height: 8,
-    backgroundColor: colors.neutralDark,
+    backgroundColor: illustration.borderStrong,
     borderRadius: 4,
     width: "100%",
   },
   contentBlock: {
     height: 60,
-    backgroundColor: colors.tertiaryLight,
+    backgroundColor: illustration.tertiaryLight,
     borderRadius: borderRadius.sm,
     marginVertical: 6,
   },

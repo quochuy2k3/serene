@@ -7,18 +7,22 @@ import Animated, {
   withTiming,
   withRepeat,
   withSequence,
-  Easing,
   interpolate,
   interpolateColor,
+  ReduceMotion,
 } from "react-native-reanimated";
 import {
-  colors,
   fonts,
   fontSizes,
+  fontScaleCaps,
   letterSpacing,
   lineHeights,
   motion,
+  motionEasing,
+  type ThemeColors,
 } from "@/constants/theme";
+import { useTheme, useThemedStyles } from "@/hooks/useTheme";
+import { ProgressRing } from "@/components/ProgressRing";
 
 type CountdownTimerProps = {
   remainingSeconds: number;
@@ -31,6 +35,8 @@ type CountdownTimerProps = {
  * Breathing sine wave timer — pulsing concentric circles.
  * Instead of a ticking progress ring, the timer breathes in and out,
  * creating a calming, meditative feel that matches the "weighted blanket" concept.
+ * A thin ambient ring just outside the breathing envelope fills as the
+ * session progresses.
  */
 export function CountdownTimer({
   remainingSeconds,
@@ -39,24 +45,33 @@ export function CountdownTimer({
   size = 260,
 }: CountdownTimerProps) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(createStyles);
   const breath = useSharedValue(0);
   const glow = useSharedValue(isActive ? 1 : 0);
+  const ringOpacity = useSharedValue(isActive ? 1 : 0);
 
   useEffect(() => {
-    // Continuous breathing animation — 4s in, 4s out
+    // Continuous breathing animation — 4s in, 4s out.
+    // The breathing pace is a deliberate calming cue, so it stays on
+    // even under reduce-motion (interface entrances still snap).
     breath.value = withRepeat(
       withSequence(
         withTiming(1, {
           duration: motion.breath,
-          easing: Easing.inOut(Easing.sin),
+          easing: motionEasing.breathe,
+          reduceMotion: ReduceMotion.Never,
         }),
         withTiming(0, {
           duration: motion.breath,
-          easing: Easing.inOut(Easing.sin),
+          easing: motionEasing.breathe,
+          reduceMotion: ReduceMotion.Never,
         })
       ),
       -1,
-      false
+      false,
+      undefined,
+      ReduceMotion.Never
     );
   }, [breath]);
 
@@ -64,7 +79,10 @@ export function CountdownTimer({
     glow.value = withTiming(isActive ? 1 : 0, {
       duration: motion.slow,
     });
-  }, [isActive, glow]);
+    ringOpacity.value = withTiming(isActive ? 1 : 0, {
+      duration: motion.slow,
+    });
+  }, [isActive, glow, ringOpacity]);
 
   const outerRing = useAnimatedStyle(() => ({
     transform: [
@@ -91,12 +109,31 @@ export function CountdownTimer({
     ),
   }));
 
+  const progressRingStyle = useAnimatedStyle(() => ({
+    opacity: ringOpacity.value,
+  }));
+
   const displaySeconds = Math.ceil(remainingSeconds);
   const progress = totalSeconds > 0 ? 1 - remainingSeconds / totalSeconds : 0;
-  const progressPercent = Math.round(progress * 100);
+
+  // Ring sits outside the outer breathing ring's 1.04 max scale.
+  const ringSize = size + 16;
+  const containerSize = ringSize;
 
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
+    <View
+      style={[styles.container, { width: containerSize, height: containerSize }]}
+    >
+      {/* Ambient session progress ring */}
+      <Animated.View style={[styles.progressRing, progressRingStyle]}>
+        <ProgressRing
+          progress={progress}
+          size={ringSize}
+          color={colors.primary}
+          trackColor={colors.border}
+        />
+      </Animated.View>
+
       {/* Outer breathing ring */}
       <Animated.View
         style={[
@@ -133,63 +170,68 @@ export function CountdownTimer({
       />
 
       {/* Center content */}
-      <View style={styles.center}>
-        <Text style={styles.seconds}>{displaySeconds}</Text>
-        <Text style={styles.unit}>{t("audio.secondsUnit")}</Text>
-        {isActive && (
-          <Text style={styles.progress}>{progressPercent}%</Text>
-        )}
+      <View
+        style={styles.center}
+        accessible
+        accessibilityLabel={t("audio.timerLabel", { seconds: displaySeconds })}
+      >
+        <Text
+          style={styles.seconds}
+          maxFontSizeMultiplier={fontScaleCaps.display}
+        >
+          {displaySeconds}
+        </Text>
+        <Text style={styles.unit} maxFontSizeMultiplier={fontScaleCaps.control}>
+          {t("audio.secondsUnit")}
+        </Text>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  ring: {
-    position: "absolute",
-    borderWidth: 1,
-    borderColor: colors.primary,
-    backgroundColor: "transparent",
-  },
-  outerRing: {
-    borderWidth: 0.5,
-  },
-  middleRing: {
-    borderWidth: 1,
-  },
-  core: {
-    position: "absolute",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
-  },
-  center: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  seconds: {
-    fontFamily: fonts.extraBold,
-    fontSize: 72,
-    color: colors.textPrimary,
-    lineHeight: 72 * lineHeights.tight,
-    letterSpacing: letterSpacing.tight,
-  },
-  unit: {
-    fontFamily: fonts.medium,
-    fontSize: fontSizes.sm,
-    color: colors.textTertiary,
-    letterSpacing: letterSpacing.wide,
-    textTransform: "lowercase",
-    marginTop: -4,
-  },
-  progress: {
-    fontFamily: fonts.semiBold,
-    fontSize: fontSizes.xs,
-    color: colors.primary,
-    marginTop: 8,
-    letterSpacing: letterSpacing.wide,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    progressRing: {
+      position: "absolute",
+    },
+    ring: {
+      position: "absolute",
+      borderWidth: 1,
+      borderColor: colors.primary,
+      backgroundColor: "transparent",
+    },
+    outerRing: {
+      borderWidth: 0.5,
+    },
+    middleRing: {
+      borderWidth: 1,
+    },
+    core: {
+      position: "absolute",
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: colors.border,
+    },
+    center: {
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    seconds: {
+      fontFamily: fonts.extraBold,
+      fontSize: 72,
+      color: colors.textPrimary,
+      lineHeight: 72 * lineHeights.tight,
+      letterSpacing: letterSpacing.tight,
+    },
+    unit: {
+      fontFamily: fonts.medium,
+      fontSize: fontSizes.sm,
+      color: colors.textTertiary,
+      letterSpacing: letterSpacing.wide,
+      textTransform: "lowercase",
+      marginTop: -4,
+    },
+  });

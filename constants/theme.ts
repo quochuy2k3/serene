@@ -5,7 +5,15 @@
  * Feels like a digital grounding experience — a "weighted blanket" for the eyes.
  */
 
-export const colors = {
+import { Easing } from "react-native-reanimated";
+
+/**
+ * Light palette — "Serene Horizon".
+ * Text tokens meet WCAG 4.5:1 on background/surface; `primary` is reserved
+ * for fills, borders and icons (3:1 UI-component rule) — use `textAccent`
+ * for small accent text.
+ */
+const light = {
   // Serene Horizon palette
   primary: "#4A90A4", // Calm Teal
   primaryLight: "#6BA8B9",
@@ -29,16 +37,13 @@ export const colors = {
   border: "#E4ECEE",
   borderStrong: "#CFDCDF",
 
-  // Legacy neutral tokens (keep for backwards compat)
-  neutral: "#F1F5F6",
-  neutralDark: "#CFDCDF",
-  card: "#FFFFFF",
-
   // Text
   textPrimary: "#1A2A33",
   textSecondary: "#5E737C",
-  textTertiary: "#8FA3AD",
+  textTertiary: "#64787F",
   textInverse: "#FFFFFF",
+  textAccent: "#357082", // Small accent text on background/surface (≥4.5:1)
+  textOnPrimary: "#FFFFFF", // Text/icons on primary-filled surfaces
 
   // States
   success: "#64B5A7",
@@ -48,12 +53,73 @@ export const colors = {
   error: "#D47070",
   errorSoft: "rgba(212, 112, 112, 0.12)",
 
+  // Motion cue dots (in-app iOS overlay)
+  motionDot: "#357082",
+  motionDotBorder: "rgba(26, 42, 51, 0.25)",
+
+  // Controls
+  sliderTrack: "#CFDCDF",
+
   // Utility
   white: "#FFFFFF",
   black: "#000000",
   overlay: "rgba(26, 42, 51, 0.5)",
   glass: "rgba(255, 255, 255, 0.72)",
-} as const;
+};
+
+export type ThemeColors = typeof light;
+
+/**
+ * Dark palette — true-dark, teal identity preserved.
+ * Very dark (not pure black) for nighttime in-car use without OLED smearing.
+ */
+const dark: ThemeColors = {
+  primary: "#6BB0C4",
+  primaryLight: "#8FC5D5",
+  primaryDark: "#4A90A4",
+  primarySoft: "rgba(107, 176, 196, 0.14)",
+
+  secondary: "#8FA6B0",
+  secondaryLight: "#5A727C",
+  secondaryDark: "#A7C0CD",
+
+  tertiary: "#24413E",
+  tertiaryLight: "#17302E",
+
+  background: "#0B1214",
+  surface: "#121B1F",
+  surfaceElevated: "#182329",
+  surfaceTinted: "#0F181C",
+
+  border: "#223037",
+  borderStrong: "#2E3F47",
+
+  textPrimary: "#E4EDF0",
+  textSecondary: "#A9BCC3",
+  textTertiary: "#7E939B",
+  textInverse: "#FFFFFF",
+  textAccent: "#8FC5D5",
+  textOnPrimary: "#0B1214",
+
+  success: "#7BC4B6",
+  successSoft: "rgba(123, 196, 182, 0.16)",
+  warning: "#E0B563",
+  warningSoft: "rgba(224, 181, 99, 0.16)",
+  error: "#E08A8A",
+  errorSoft: "rgba(224, 138, 138, 0.16)",
+
+  motionDot: "#B8DCE6",
+  motionDotBorder: "rgba(0, 0, 0, 0.35)",
+
+  sliderTrack: "#2E3F47",
+
+  white: "#FFFFFF",
+  black: "#000000",
+  overlay: "rgba(0, 0, 0, 0.6)",
+  glass: "rgba(18, 27, 31, 0.72)",
+};
+
+export const palettes = { light, dark } as const;
 
 export const fonts = {
   regular: "Manrope_400Regular",
@@ -115,6 +181,7 @@ export const borderRadius = {
 
 /**
  * Shadows are extremely subtle — we use borders and tonal shifts instead.
+ * In dark mode, tonal separation (surface vs surfaceElevated) carries depth.
  */
 export const shadows = {
   none: {
@@ -162,4 +229,32 @@ export const motion = {
   quick: 180,
   normal: 300,
   slow: 500,
+} as const;
+
+/**
+ * Shared easing curves — one motion language app-wide.
+ */
+export const motionEasing = {
+  enter: Easing.out(Easing.cubic), // Screen/element entrances
+  breathe: Easing.inOut(Easing.sin), // Breathing cycles
+  standard: Easing.inOut(Easing.quad), // Property transitions
+} as const;
+
+/**
+ * Shared spring configs — low-bounce, calm.
+ */
+export const springs = {
+  pill: { damping: 18, stiffness: 180, mass: 0.6 },
+  dot: { damping: 15, stiffness: 120 },
+} as const;
+
+/**
+ * Caps for OS font scaling (maxFontSizeMultiplier) — scaling stays on,
+ * but layout-critical text stops growing past these factors.
+ */
+export const fontScaleCaps = {
+  heading: 1.4,
+  body: 2.0,
+  control: 1.6,
+  display: 1.2,
 } as const;
