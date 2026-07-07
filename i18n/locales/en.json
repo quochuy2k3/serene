@@ -11,7 +11,18 @@
     "next": "Next",
     "done": "Done",
     "on": "On",
-    "off": "Off"
+    "off": "Off",
+    "back": "Back",
+    "close": "Close",
+    "retry": "Try again",
+    "stepIndicator": "Step {{current}} of {{total}}"
+  },
+  "errors": {
+    "storageSave": "Couldn't save your changes — they may not persist.",
+    "storageLoad": "Couldn't load saved preferences — using defaults.",
+    "crashTitle": "Something went wrong",
+    "crashMessage": "The app hit an unexpected error.",
+    "crashRestart": "Restart"
   },
   "home": {
     "greeting": "Welcome to",
@@ -24,7 +35,13 @@
     "startSession": "Start session",
     "activateOverlay": "Activate overlay",
     "manageOverlay": "Manage overlay",
-    "researchNote": "Based on research from Nagoya University (2025) and Apple's Vehicle Motion Cues."
+    "researchNote": "Based on research from Nagoya University (2025) and Apple's Vehicle Motion Cues.",
+    "durationPill": "{{seconds}}s",
+    "welcomeTitle": "Welcome to Serene",
+    "welcomeBody": "A 60-second 100 Hz audio session and on-screen motion cues that may help reduce motion sickness symptoms during travel.",
+    "welcomeDismiss": "Got it",
+    "audioCardHint": "Opens the 100 Hz audio session",
+    "motionCardHint": "Opens motion cues settings"
   },
   "audio": {
     "eyebrow": "100 Hz Therapy",
@@ -34,7 +51,15 @@
     "headphoneBadge": "Headphones required",
     "startListening": "Start Listening",
     "secondsUnit": "seconds",
-    "listening": "Now playing"
+    "listening": "Now playing",
+    "whyExplainer": "A pure 100 Hz tone may help calm the vestibular system — the inner-ear organ behind motion sickness.",
+    "interrupted": "Session paused — the audio was interrupted.",
+    "resume": "Resume",
+    "restart": "Restart",
+    "error": "Couldn't play the audio.",
+    "errorHint": "Check your volume and try again.",
+    "completedAnnouncement": "Session complete",
+    "timerLabel": "{{seconds}} seconds remaining"
   },
   "done": {
     "eyebrow": "Session Complete",
@@ -43,6 +68,7 @@
     "durationLabel": "Estimated effect",
     "effectDuration": "Up to 2 hours",
     "enableMotionCues": "Enable Motion Cues",
+    "listenAgain": "Listen again",
     "backHome": "Back to home",
     "disclaimer": "Results may vary by individual. Based on research from Nagoya University."
   },
@@ -69,7 +95,11 @@
         "slide3Reason": "So the dots appear when you use TikTok, YouTube, or any other app",
         "slide3Privacy": "Serene never reads the content of your screen.",
         "slide3Grant": "Grant Permission",
-        "slide3Later": "Skip, I'll do it later"
+        "slide3Later": "Skip, I'll do it later",
+        "slide3Step1": "Tap Grant Permission below",
+        "slide3Step2": "In the list that opens, find Serene",
+        "slide3Step3": "Turn on \"Display over other apps\"",
+        "slide3Step4": "Return to Serene — you're done"
       },
       "control": {
         "active": "Active",
@@ -87,7 +117,10 @@
         "styleRegular": "Regular",
         "styleDynamic": "Dynamic",
         "styleRegularDescription": "Dots shift toward the direction of motion and settle back. Calm and predictable.",
-        "styleDynamicDescription": "A field of dots flows across the edges while the vehicle speeds up, brakes, or turns — matching the motion your body feels."
+        "styleDynamicDescription": "A field of dots flows across the edges while the vehicle speeds up, brakes, or turns — matching the motion your body feels.",
+        "deniedTitle": "Permission not granted yet",
+        "deniedDescription": "In the settings list, find Serene and turn on \"Display over other apps\", then come back.",
+        "reopenSettings": "Open Settings again"
       }
     },
     "ios": {
@@ -115,7 +148,9 @@
         "openSettings": "Open Settings",
         "inAppOverlay": "In-App Overlay",
         "inAppDescription": "Show dots while using Serene (foreground only)",
-        "unsupportedVersion": "This feature requires iOS 18 or later. Please update your iPhone."
+        "unsupportedVersion": "This feature requires iOS 18 or later. Please update your iPhone.",
+        "openSettingsFailed": "Couldn't open Settings automatically.",
+        "openSettingsFallback": "Open Settings → Accessibility → Motion → Vehicle Motion Cues manually."
       }
     }
   },
@@ -140,6 +175,14 @@
     "aboutDescription": "Serene combines 100 Hz audio therapy and motion cues overlay to help reduce motion sickness symptoms during travel.",
     "research": "Based on research from Nagoya University, Japan",
     "version": "Version",
-    "language": "Language"
+    "language": "Language",
+    "languageHint": "Switches between English and Vietnamese",
+    "appearance": "Appearance",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "reduceMotion": "Reduce animations",
+    "reduceMotionDescription": "Minimize interface animations. Motion cue dots are never affected.",
+    "opacityPreview": "Dot opacity preview"
   }
 }
