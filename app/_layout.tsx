@@ -13,11 +13,13 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ReducedMotionConfig, ReduceMotion } from "react-native-reanimated";
 import { i18nPromise } from "@/i18n";
-import { SettingsProvider } from "@/hooks/useSettings";
+import { SettingsProvider, useSettings } from "@/hooks/useSettings";
+import { ThemeProvider, useTheme } from "@/hooks/useTheme";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { MotionDotsOverlay } from "@/components/MotionDotsOverlay";
 import { useMotionCues } from "@/hooks/useMotionCues";
-import { colors } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -65,35 +67,54 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <SettingsProvider>
-          <StatusBar style="dark" />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: colors.background },
-            }}
-          >
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen
-              name="audio"
-              options={{
-                presentation: "modal",
-                animation: "fade_from_bottom",
-              }}
-            />
-            <Stack.Screen
-              name="done"
-              options={{
-                presentation: "modal",
-                animation: "fade",
-              }}
-            />
-          </Stack>
-          <IOSOverlay />
-        </SettingsProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <SettingsProvider>
+            <ThemeProvider>
+              <ThemedRoot />
+            </ThemeProvider>
+          </SettingsProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
+  );
+}
+
+function ThemedRoot() {
+  const { colors, scheme } = useTheme();
+  const { settings } = useSettings();
+
+  return (
+    <>
+      <ReducedMotionConfig
+        mode={settings.reduceMotion ? ReduceMotion.Always : ReduceMotion.System}
+      />
+      <StatusBar style={scheme === "dark" ? "light" : "dark"} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      >
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="audio"
+          options={{
+            presentation: "modal",
+            animation: "fade_from_bottom",
+          }}
+        />
+        <Stack.Screen
+          name="done"
+          options={{
+            presentation: "modal",
+            animation: "fade",
+            gestureEnabled: true,
+          }}
+        />
+      </Stack>
+      <IOSOverlay />
+    </>
   );
 }

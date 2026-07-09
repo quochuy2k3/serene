@@ -4,8 +4,8 @@ import {
   useAnimatedStyle,
   withTiming,
   withDelay,
-  Easing,
 } from "react-native-reanimated";
+import { motion, motionEasing } from "@/constants/theme";
 
 /**
  * Returns an animated style that fades + slides up content on mount.
@@ -21,11 +21,11 @@ export function useScreenEntrance(delay = 0) {
   useEffect(() => {
     opacity.value = withDelay(
       delay,
-      withTiming(1, { duration: 500, easing: Easing.out(Easing.cubic) })
+      withTiming(1, { duration: motion.slow, easing: motionEasing.enter })
     );
     translateY.value = withDelay(
       delay,
-      withTiming(0, { duration: 500, easing: Easing.out(Easing.cubic) })
+      withTiming(0, { duration: motion.slow, easing: motionEasing.enter })
     );
   }, [delay, opacity, translateY]);
 

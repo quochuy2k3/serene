@@ -8,7 +8,15 @@ import {
   type NativeSyntheticEvent,
   type NativeScrollEvent,
 } from "react-native";
-import { colors, fonts, fontSizes, spacing } from "@/constants/theme";
+import { useTranslation } from "react-i18next";
+import {
+  fonts,
+  fontSizes,
+  fontScaleCaps,
+  spacing,
+  type ThemeColors,
+} from "@/constants/theme";
+import { useThemedStyles } from "@/hooks/useTheme";
 import { useTabBarClearance } from "@/hooks/useTabBarClearance";
 import { Button } from "./Button";
 
@@ -22,6 +30,8 @@ export type Slide = {
   secondaryCta?: {
     label: string;
     onPress: () => void;
+    variant?: "ghost" | "outlined";
+    size?: "md" | "lg";
   };
 };
 
@@ -36,6 +46,8 @@ export function OnboardingSlides({ slides, title }: OnboardingSlidesProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const tabBarClearance = useTabBarClearance();
+  const { t } = useTranslation();
+  const styles = useThemedStyles(createStyles);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const newIndex = Math.round(
@@ -63,7 +75,11 @@ export function OnboardingSlides({ slides, title }: OnboardingSlidesProps) {
 
   return (
     <View style={styles.container}>
-      {title && <Text style={styles.title}>{title}</Text>}
+      {title && (
+        <Text style={styles.title} maxFontSizeMultiplier={fontScaleCaps.heading}>
+          {title}
+        </Text>
+      )}
 
       <FlatList
         ref={flatListRef}
@@ -84,7 +100,15 @@ export function OnboardingSlides({ slides, title }: OnboardingSlidesProps) {
       />
 
       <View style={[styles.footer, { paddingBottom: tabBarClearance }]}>
-        <View style={styles.dots}>
+        <View
+          style={styles.dots}
+          accessible
+          accessibilityLabel={t("common.stepIndicator", {
+            current: currentIndex + 1,
+            total: slides.length,
+          })}
+          accessibilityLiveRegion="polite"
+        >
           {slides.map((_, i) => (
             <View
               key={i}
@@ -101,8 +125,8 @@ export function OnboardingSlides({ slides, title }: OnboardingSlidesProps) {
             <Button
               label={current.secondaryCta.label}
               onPress={current.secondaryCta.onPress}
-              variant="ghost"
-              size="md"
+              variant={current.secondaryCta.variant ?? "ghost"}
+              size={current.secondaryCta.size ?? "md"}
               fullWidth
             />
           )}
@@ -123,18 +147,19 @@ export function OnboardingSlides({ slides, title }: OnboardingSlidesProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  title: {
-    fontFamily: fonts.bold,
-    fontSize: fontSizes["2xl"],
-    color: colors.textPrimary,
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-  },
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    title: {
+      fontFamily: fonts.bold,
+      fontSize: fontSizes["2xl"],
+      color: colors.textPrimary,
+      paddingHorizontal: spacing.lg,
+      marginBottom: spacing.md,
+    },
   slide: {
     width: SCREEN_WIDTH,
     paddingHorizontal: spacing.lg,
@@ -154,7 +179,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.neutralDark,
+    backgroundColor: colors.borderStrong,
   },
   dotActive: {
     width: 24,

@@ -22,6 +22,9 @@ export function useMotionCues() {
   const [isActive, setIsActive] = useState(false);
   const [iosOverlayEnabled, setIosOverlayEnabled] = useState(false);
   const [iosAppleCuesConfirmed, setIosAppleCuesConfirmed] = useState(false);
+  const [persistError, setPersistError] = useState<"load" | "save" | null>(
+    null
+  );
 
   const { settings } = useSettings();
   const { t } = useTranslation();
@@ -50,6 +53,7 @@ export function useMotionCues() {
         setIosAppleCuesConfirmed(confirmed === "true");
       } catch {
         setIsFirstTime(true);
+        setPersistError("load");
       }
     })();
   }, []);
@@ -96,7 +100,7 @@ export function useMotionCues() {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.firstTime, "completed");
     } catch {
-      // Ignore
+      setPersistError("save");
     }
     setIsFirstTime(false);
   }, []);
@@ -105,7 +109,7 @@ export function useMotionCues() {
     try {
       await AsyncStorage.removeItem(STORAGE_KEYS.firstTime);
     } catch {
-      // Ignore
+      setPersistError("save");
     }
     setIsFirstTime(true);
   }, []);
@@ -165,7 +169,7 @@ export function useMotionCues() {
         enabled ? "true" : "false"
       );
     } catch {
-      // Ignore
+      setPersistError("save");
     }
     setIosOverlayEnabled(enabled);
   }, []);
@@ -175,10 +179,12 @@ export function useMotionCues() {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.iosAppleCuesConfirmed, "true");
     } catch {
-      // Ignore
+      setPersistError("save");
     }
     setIosAppleCuesConfirmed(true);
   }, []);
+
+  const clearPersistError = useCallback(() => setPersistError(null), []);
 
   return {
     isFirstTime,
@@ -194,5 +200,7 @@ export function useMotionCues() {
     stopOverlay,
     toggleIOSOverlay,
     confirmIOSAppleCues,
+    persistError,
+    clearPersistError,
   };
 }

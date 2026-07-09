@@ -1,7 +1,7 @@
 {
   "tabs": {
     "home": "Trang chủ",
-    "motion": "Motion",
+    "motion": "Chuyển động",
     "settings": "Cài đặt"
   },
   "common": {
@@ -11,7 +11,18 @@
     "next": "Tiếp theo",
     "done": "Xong",
     "on": "Bật",
-    "off": "Tắt"
+    "off": "Tắt",
+    "back": "Quay lại",
+    "close": "Đóng",
+    "retry": "Thử lại",
+    "stepIndicator": "Bước {{current}} / {{total}}"
+  },
+  "errors": {
+    "storageSave": "Không lưu được thay đổi — cài đặt có thể không được giữ lại.",
+    "storageLoad": "Không tải được cài đặt đã lưu — đang dùng mặc định.",
+    "crashTitle": "Đã có lỗi xảy ra",
+    "crashMessage": "Ứng dụng gặp lỗi không mong muốn.",
+    "crashRestart": "Khởi động lại"
   },
   "home": {
     "greeting": "Chào mừng đến với",
@@ -24,7 +35,13 @@
     "startSession": "Bắt đầu phiên",
     "activateOverlay": "Kích hoạt overlay",
     "manageOverlay": "Quản lý overlay",
-    "researchNote": "Dựa trên nghiên cứu từ Đại học Nagoya (2025) và Apple Vehicle Motion Cues."
+    "researchNote": "Dựa trên nghiên cứu từ Đại học Nagoya (2025) và Apple Vehicle Motion Cues.",
+    "durationPill": "{{seconds}} giây",
+    "welcomeTitle": "Chào mừng đến với Serene",
+    "welcomeBody": "Phiên âm thanh 100 Hz dài 60 giây và motion cues trên màn hình có thể giúp giảm triệu chứng say tàu xe khi di chuyển.",
+    "welcomeDismiss": "Đã hiểu",
+    "audioCardHint": "Mở phiên âm thanh 100 Hz",
+    "motionCardHint": "Mở cài đặt motion cues"
   },
   "audio": {
     "eyebrow": "Liệu pháp 100 Hz",
@@ -34,7 +51,15 @@
     "headphoneBadge": "Cần tai nghe",
     "startListening": "Bắt đầu nghe",
     "secondsUnit": "giây",
-    "listening": "Đang phát"
+    "listening": "Đang phát",
+    "whyExplainer": "Âm thuần 100 Hz có thể giúp làm dịu hệ tiền đình — cơ quan trong tai gây say tàu xe.",
+    "interrupted": "Phiên tạm dừng — âm thanh bị gián đoạn.",
+    "resume": "Tiếp tục",
+    "restart": "Bắt đầu lại",
+    "error": "Không phát được âm thanh.",
+    "errorHint": "Kiểm tra âm lượng và thử lại.",
+    "completedAnnouncement": "Phiên đã hoàn tất",
+    "timerLabel": "Còn {{seconds}} giây"
   },
   "done": {
     "eyebrow": "Hoàn tất phiên",
@@ -43,6 +68,7 @@
     "durationLabel": "Hiệu quả ước tính",
     "effectDuration": "Lên tới 2 giờ",
     "enableMotionCues": "Bật Motion Cues",
+    "listenAgain": "Nghe lại",
     "backHome": "Về trang chủ",
     "disclaimer": "Hiệu quả có thể khác nhau tùy người. Dựa trên nghiên cứu từ Đại học Nagoya."
   },
@@ -69,7 +95,11 @@
         "slide3Reason": "Để dots xuất hiện khi bạn dùng TikTok, YouTube hay bất kỳ app nào khác",
         "slide3Privacy": "Serene không đọc nội dung màn hình của bạn.",
         "slide3Grant": "Cấp quyền",
-        "slide3Later": "Bỏ qua, làm sau"
+        "slide3Later": "Bỏ qua, làm sau",
+        "slide3Step1": "Nhấn Cấp quyền bên dưới",
+        "slide3Step2": "Trong danh sách hiện ra, tìm Serene",
+        "slide3Step3": "Bật \"Hiển thị trên ứng dụng khác\"",
+        "slide3Step4": "Quay lại Serene — xong rồi"
       },
       "control": {
         "active": "Đang hoạt động",
@@ -87,7 +117,10 @@
         "styleRegular": "Thường",
         "styleDynamic": "Động",
         "styleRegularDescription": "Các chấm dịch theo hướng chuyển động rồi trở về vị trí cũ. Nhẹ nhàng và dễ đoán.",
-        "styleDynamicDescription": "Một trường các chấm trôi dọc theo mép màn hình khi xe tăng tốc, phanh hoặc rẽ — khớp với chuyển động cơ thể bạn cảm nhận."
+        "styleDynamicDescription": "Một trường các chấm trôi dọc theo mép màn hình khi xe tăng tốc, phanh hoặc rẽ — khớp với chuyển động cơ thể bạn cảm nhận.",
+        "deniedTitle": "Chưa được cấp quyền",
+        "deniedDescription": "Trong danh sách cài đặt, tìm Serene và bật \"Hiển thị trên ứng dụng khác\", rồi quay lại.",
+        "reopenSettings": "Mở lại Cài đặt"
       }
     },
     "ios": {
@@ -115,7 +148,9 @@
         "openSettings": "Mở Cài đặt",
         "inAppOverlay": "Overlay trong ứng dụng",
         "inAppDescription": "Hiển thị dots khi dùng Serene (chỉ khi app đang mở)",
-        "unsupportedVersion": "Tính năng này yêu cầu iOS 18 trở lên. Vui lòng cập nhật iPhone."
+        "unsupportedVersion": "Tính năng này yêu cầu iOS 18 trở lên. Vui lòng cập nhật iPhone.",
+        "openSettingsFailed": "Không mở được Cài đặt tự động.",
+        "openSettingsFallback": "Hãy mở Cài đặt → Trợ năng → Chuyển động → Vehicle Motion Cues thủ công."
       }
     }
   },
@@ -140,6 +175,14 @@
     "aboutDescription": "Serene kết hợp liệu pháp âm thanh 100 Hz và overlay motion cues để giúp giảm triệu chứng say xe khi di chuyển.",
     "research": "Dựa trên nghiên cứu từ Đại học Nagoya, Nhật Bản",
     "version": "Phiên bản",
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "languageHint": "Chuyển giữa tiếng Anh và tiếng Việt",
+    "appearance": "Giao diện",
+    "themeSystem": "Hệ thống",
+    "themeLight": "Sáng",
+    "themeDark": "Tối",
+    "reduceMotion": "Giảm hiệu ứng động",
+    "reduceMotionDescription": "Giảm thiểu hiệu ứng động của giao diện. Các chấm motion cues không bao giờ bị ảnh hưởng.",
+    "opacityPreview": "Xem trước độ mờ chấm"
   }
 }

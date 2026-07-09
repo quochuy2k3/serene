@@ -18,12 +18,17 @@ import { MOTION_CUES_CONFIG } from "@/constants/config";
 
 const STORAGE_KEY = "serene_settings";
 
+export type ThemeMode = "system" | "light" | "dark";
+
 export type Settings = {
   dotSize: DotSize;
   dotDensity: DotDensity;
   dotOpacity: number;
   sensitivity: Sensitivity;
   motionStyle: MotionStyle;
+  themeMode: ThemeMode;
+  reduceMotion: boolean;
+  welcomeSeen: boolean;
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -32,12 +37,19 @@ const DEFAULT_SETTINGS: Settings = {
   dotOpacity: MOTION_CUES_CONFIG.defaultOpacity,
   sensitivity: MOTION_CUES_CONFIG.defaultSensitivity,
   motionStyle: MOTION_CUES_CONFIG.defaultMotionStyle,
+  themeMode: "system",
+  reduceMotion: false,
+  welcomeSeen: false,
 };
+
+export type StorageError = "load" | "save" | null;
 
 type SettingsContextValue = {
   settings: Settings;
   updateSettings: (partial: Partial<Settings>) => Promise<void>;
   isLoaded: boolean;
+  storageError: StorageError;
+  clearStorageError: () => void;
 };
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -45,6 +57,7 @@ const SettingsContext = createContext<SettingsContextValue | null>(null);
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [storageError, setStorageError] = useState<StorageError>(null);
 
   useEffect(() => {
     (async () => {
@@ -55,7 +68,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           setSettings({ ...DEFAULT_SETTINGS, ...parsed });
         }
       } catch {
-        // Fall back to defaults
+        setStorageError("load");
       } finally {
         setIsLoaded(true);
       }
@@ -67,7 +80,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       setSettings((prev) => {
         const next = { ...prev, ...partial };
         AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {
-          // Ignore storage errors
+          setStorageError("save");
         });
         return next;
       });
@@ -75,9 +88,17 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const clearStorageError = useCallback(() => setStorageError(null), []);
+
   const value = useMemo(
-    () => ({ settings, updateSettings, isLoaded }),
-    [settings, updateSettings, isLoaded]
+    () => ({
+      settings,
+      updateSettings,
+      isLoaded,
+      storageError,
+      clearStorageError,
+    }),
+    [settings, updateSettings, isLoaded, storageError, clearStorageError]
   );
 
   return (
