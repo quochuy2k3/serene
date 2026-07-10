@@ -7,6 +7,7 @@ import Animated, {
   withSequence,
   withRepeat,
   withDelay,
+  cancelAnimation,
   Easing,
 } from "react-native-reanimated";
 import { palettes, borderRadius, shadows } from "@/constants/theme";
@@ -32,11 +33,24 @@ const DOT_POSITIONS = [
   { top: MOCKUP_HEIGHT * 0.68, right: 10 },
 ] as const;
 
-export function DemoPhoneMockup() {
+type DemoPhoneMockupProps = {
+  /** Pause the demo loop while the mockup isn't visible (offscreen slide,
+   * unfocused tab) so it doesn't burn frames on low-end devices. */
+  paused?: boolean;
+};
+
+export function DemoPhoneMockup({ paused = false }: DemoPhoneMockupProps) {
   const shiftX = useSharedValue(0);
   const shiftY = useSharedValue(0);
 
   useEffect(() => {
+    if (paused) {
+      cancelAnimation(shiftX);
+      cancelAnimation(shiftY);
+      shiftX.value = 0;
+      shiftY.value = 0;
+      return;
+    }
     const duration = 800;
     const pause = 1500;
     const easing = Easing.inOut(Easing.quad);
@@ -72,7 +86,7 @@ export function DemoPhoneMockup() {
         false
       )
     );
-  }, [shiftX, shiftY]);
+  }, [paused, shiftX, shiftY]);
 
   const dotStyle = useAnimatedStyle(() => ({
     transform: [

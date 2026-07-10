@@ -187,7 +187,7 @@ export default function AudioScreen() {
               label={t("common.stop")}
               onPress={handleStop}
               variant="outlined"
-              size="md"
+              size="lg"
               haptic="none"
               fullWidth
             />

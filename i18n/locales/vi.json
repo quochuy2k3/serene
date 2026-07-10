@@ -14,6 +14,7 @@
     "off": "Tắt",
     "back": "Quay lại",
     "close": "Đóng",
+    "skip": "Bỏ qua",
     "retry": "Thử lại",
     "stepIndicator": "Bước {{current}} / {{total}}"
   },
@@ -77,6 +78,16 @@
     "title": "Motion Cues",
     "howItWorks": "8 chấm tròn nhỏ ở viền màn hình di chuyển theo chuyển động xe, giúp não bộ đồng bộ những gì mắt nhìn thấy với cảm nhận của cơ thể.",
     "reviewGuide": "Xem lại hướng dẫn",
+    "tips": {
+      "title": "Để đạt hiệu quả tốt nhất",
+      "subtitle": "Vài thói quen nhỏ giúp motion cues hiệu quả hơn.",
+      "tip1": "Bật cues trước khi xe lăn bánh — phòng hơn chống.",
+      "tip2": "Giữ điện thoại trong tầm mắt, tốt nhất là gắn giá đỡ hoặc cầm chắc tay.",
+      "tip3": "Kết hợp với phiên âm thanh 100 Hz để hỗ trợ cả thính giác lẫn thị giác.",
+      "tip4": "Vẫn thấy khó chịu? Nhìn ra đường chân trời và cho mắt nghỉ khỏi màn hình.",
+      "disclaimer": "Serene có thể giúp giảm triệu chứng say tàu xe — hiệu quả tuỳ từng người."
+    },
+    "helpTitle": "Trợ giúp & xử lý sự cố",
     "notification": {
       "title": "Serene — Motion Cues đang bật",
       "text": "Giúp giảm say tàu xe"
@@ -121,6 +132,16 @@
         "deniedTitle": "Chưa được cấp quyền",
         "deniedDescription": "Trong danh sách cài đặt, tìm Serene và bật \"Hiển thị trên ứng dụng khác\", rồi quay lại.",
         "reopenSettings": "Mở lại Cài đặt"
+      },
+      "help": {
+        "q1": "Dots không hiển thị trên app khác",
+        "a1": "Kiểm tra quyền \"Hiển thị trên ứng dụng khác\" đã được cấp, rồi tắt và bật lại overlay.",
+        "q2": "Dots bị đứng hoặc biến mất sau một lúc",
+        "a2": "Tối ưu hoá pin có thể đang dừng dịch vụ. Vào Cài đặt → Pin, đặt Serene ở chế độ Không giới hạn (tên gọi tuỳ máy).",
+        "q3": "Sao có thông báo luôn hiển thị?",
+        "a3": "Android yêu cầu hiển thị thông báo khi dịch vụ overlay đang chạy. Thông báo được đặt mức ưu tiên thấp nhất — im lặng và thu gọn.",
+        "q4": "Màn hình cài đặt trên máy tôi trông khác",
+        "a4": "Trên Android 11 trở lên, hệ thống mở danh sách tất cả ứng dụng — tìm Serene trong đó. Bản cũ hơn mở thẳng trang của Serene. Giao diện từng hãng có thể đổi tên mục cài đặt."
       }
     },
     "ios": {
@@ -151,6 +172,20 @@
         "unsupportedVersion": "Tính năng này yêu cầu iOS 18 trở lên. Vui lòng cập nhật iPhone.",
         "openSettingsFailed": "Không mở được Cài đặt tự động.",
         "openSettingsFallback": "Hãy mở Cài đặt → Trợ năng → Chuyển động → Vehicle Motion Cues thủ công."
+      },
+      "help": {
+        "q1": "Không tìm thấy Vehicle Motion Cues",
+        "a1": "Tính năng cần iOS 18 trở lên trên iPhone 12 và mới hơn. Cập nhật iOS trong Cài đặt → Cài đặt chung → Cập nhật phần mềm, rồi tìm trong Trợ năng → Chuyển động.",
+        "q2": "Cài đặt nằm chính xác ở đâu?",
+        "a2": "Cài đặt → Trợ năng → Chuyển động → Vehicle Motion Cues. Chọn Tự động để iPhone chỉ hiện dots khi bạn đang di chuyển.",
+        "q3": "Sao overlay của Serene chỉ hoạt động trong app?",
+        "a3": "Apple không cho phép ứng dụng bên thứ ba vẽ đè lên app khác. Muốn dots trên toàn hệ thống, hãy dùng Vehicle Motion Cues có sẵn của Apple."
+      },
+      "mockup": {
+        "settings": "Cài đặt",
+        "accessibility": "Trợ năng",
+        "motionRow": "Chuyển động",
+        "vehicleCues": "Vehicle Motion Cues"
       }
     }
   },

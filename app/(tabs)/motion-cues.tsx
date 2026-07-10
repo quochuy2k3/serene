@@ -9,18 +9,30 @@ import {
   Switch,
   Pressable,
   ActivityIndicator,
+  type LayoutChangeEvent,
 } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useIsFocused } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  FadeInDown,
+  LinearTransition,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+} from "react-native-reanimated";
 import {
   fonts,
   fontSizes,
   fontScaleCaps,
+  letterSpacing,
   spacing,
   borderRadius,
   shadows,
   motion,
+  springs,
   type ThemeColors,
 } from "@/constants/theme";
 import { Button } from "@/components/Button";
@@ -31,68 +43,95 @@ import {
   type Slide,
 } from "@/components/OnboardingSlides";
 import { DemoPhoneMockup } from "@/components/DemoPhoneMockup";
+import {
+  SettingsPathMockup,
+  useStageLoop,
+} from "@/components/SettingsPathMockup";
+import { CollapsibleCard } from "@/components/CollapsibleCard";
+import { PulsingDot } from "@/components/PulsingDot";
 import { useMotionCues } from "@/hooks/useMotionCues";
 import { useSettings } from "@/hooks/useSettings";
 import { useTheme, useThemedStyles } from "@/hooks/useTheme";
 import { useTabBarClearance } from "@/hooks/useTabBarClearance";
+import { useStaggeredEntrance } from "@/hooks/useScreenEntrance";
 import type { MotionStyle } from "@/constants/config";
 
 // ============================================================
 // Android Onboarding Slides
 // ============================================================
 
-function AndroidSlide1Demo() {
+function AndroidSlideDemo({ focused }: { focused: boolean }) {
   const { t } = useTranslation();
   const slideStyles = useThemedStyles(createSlideStyles);
+  // Pause the demo loop when the slide is offscreen or another tab is open
+  // (tab scenes stay mounted because of detachInactiveScreens={false}).
+  const tabFocused = useIsFocused();
   return (
     <View style={slideStyles.center}>
-      <DemoPhoneMockup />
-      <Text
-        style={slideStyles.heading}
-        maxFontSizeMultiplier={fontScaleCaps.heading}
-      >
-        {t("motionCues.android.onboarding.slide1Title")}
-      </Text>
-      <Text
-        style={slideStyles.caption}
-        maxFontSizeMultiplier={fontScaleCaps.body}
-      >
-        {t("motionCues.android.onboarding.slide1Caption")}
-      </Text>
+      <Animated.View entering={FadeInDown.duration(motion.slow)}>
+        <DemoPhoneMockup paused={!focused || !tabFocused} />
+      </Animated.View>
+      <Animated.View entering={FadeInDown.delay(120).duration(motion.slow)}>
+        <Text
+          style={slideStyles.heading}
+          maxFontSizeMultiplier={fontScaleCaps.heading}
+        >
+          {t("motionCues.android.onboarding.slide1Title")}
+        </Text>
+      </Animated.View>
+      <Animated.View entering={FadeInDown.delay(220).duration(motion.slow)}>
+        <Text
+          style={slideStyles.caption}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
+          {t("motionCues.android.onboarding.slide1Caption")}
+        </Text>
+      </Animated.View>
     </View>
   );
 }
 
-function AndroidSlide2Explanation() {
+function AndroidSlideExplanation() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <View style={slideStyles.center}>
-      <View style={slideStyles.iconBadge}>
-        <Ionicons name="sync-outline" size={40} color={colors.primary} />
-      </View>
-      <Text
-        style={slideStyles.heading}
-        maxFontSizeMultiplier={fontScaleCaps.heading}
+      <Animated.View
+        entering={FadeInDown.duration(motion.slow)}
+        style={slideStyles.iconBadge}
       >
-        {t("motionCues.android.onboarding.slide2Title")}
-      </Text>
+        <Ionicons name="sync-outline" size={40} color={colors.primary} />
+      </Animated.View>
+      <Animated.View entering={FadeInDown.delay(100).duration(motion.slow)}>
+        <Text
+          style={slideStyles.heading}
+          maxFontSizeMultiplier={fontScaleCaps.heading}
+        >
+          {t("motionCues.android.onboarding.slide2Title")}
+        </Text>
+      </Animated.View>
       <View style={slideStyles.flowList}>
-        <FlowItem
-          icon="eye-outline"
-          text={t("motionCues.android.onboarding.slide2Eye")}
-        />
+        <Animated.View entering={FadeInDown.delay(180).duration(motion.slow)}>
+          <FlowItem
+            icon="eye-outline"
+            text={t("motionCues.android.onboarding.slide2Eye")}
+          />
+        </Animated.View>
         <View style={slideStyles.flowArrow} />
-        <FlowItem
-          icon="ear-outline"
-          text={t("motionCues.android.onboarding.slide2Ear")}
-        />
+        <Animated.View entering={FadeInDown.delay(280).duration(motion.slow)}>
+          <FlowItem
+            icon="ear-outline"
+            text={t("motionCues.android.onboarding.slide2Ear")}
+          />
+        </Animated.View>
         <View style={slideStyles.flowArrow} />
-        <FlowItem
-          icon="sparkles-outline"
-          text={t("motionCues.android.onboarding.slide2Brain")}
-        />
+        <Animated.View entering={FadeInDown.delay(380).duration(motion.slow)}>
+          <FlowItem
+            icon="sparkles-outline"
+            text={t("motionCues.android.onboarding.slide2Brain")}
+          />
+        </Animated.View>
       </View>
       <Text
         style={slideStyles.source}
@@ -104,10 +143,13 @@ function AndroidSlide2Explanation() {
   );
 }
 
-function AndroidSlide3Permission() {
+function AndroidSlidePermission({ focused }: { focused: boolean }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const slideStyles = useThemedStyles(createSlideStyles);
+  const tabFocused = useIsFocused();
+  // One looping timeline drives the mockup highlight and the step list.
+  const stage = useStageLoop(4, focused && tabFocused);
   return (
     <ScrollView
       style={{ flex: 1 }}
@@ -146,24 +188,29 @@ function AndroidSlide3Permission() {
           {t("motionCues.android.onboarding.slide3Reason")}
         </Text>
       </View>
+      <SettingsPathMockup variant="android" stage={stage} />
       {/* Android 11+ opens the top-level app list, not Serene's page —
           walk the user through finding it. */}
       <View style={slideStyles.steps}>
         <StepItem
           number={1}
           text={t("motionCues.android.onboarding.slide3Step1")}
+          active={stage === 0}
         />
         <StepItem
           number={2}
           text={t("motionCues.android.onboarding.slide3Step2")}
+          active={stage === 1}
         />
         <StepItem
           number={3}
           text={t("motionCues.android.onboarding.slide3Step3")}
+          active={stage === 2}
         />
         <StepItem
           number={4}
           text={t("motionCues.android.onboarding.slide3Step4")}
+          active={stage === 3}
         />
       </View>
       <View style={slideStyles.privacyRow}>
@@ -180,44 +227,114 @@ function AndroidSlide3Permission() {
 }
 
 // ============================================================
+// Shared "Best results" Tips Slide
+// ============================================================
+
+const TIP_ITEMS = [
+  { icon: "time-outline", key: "motionCues.tips.tip1" },
+  { icon: "phone-portrait-outline", key: "motionCues.tips.tip2" },
+  { icon: "headset-outline", key: "motionCues.tips.tip3" },
+  { icon: "sunny-outline", key: "motionCues.tips.tip4" },
+] as const;
+
+function TipsSlide() {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const slideStyles = useThemedStyles(createSlideStyles);
+  return (
+    <ScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={slideStyles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={slideStyles.centerHorizontal}>
+        <View style={slideStyles.iconBadge}>
+          <Ionicons name="sparkles-outline" size={40} color={colors.primary} />
+        </View>
+        <Text
+          style={slideStyles.heading}
+          maxFontSizeMultiplier={fontScaleCaps.heading}
+        >
+          {t("motionCues.tips.title")}
+        </Text>
+        <Text
+          style={slideStyles.caption}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
+          {t("motionCues.tips.subtitle")}
+        </Text>
+      </View>
+      <View style={slideStyles.tipsList}>
+        {TIP_ITEMS.map(({ icon, key }, i) => (
+          <Animated.View
+            key={key}
+            entering={FadeInDown.delay(120 + i * 90).duration(motion.slow)}
+          >
+            <FlowItem icon={icon} text={t(key)} />
+          </Animated.View>
+        ))}
+      </View>
+      <Text
+        style={slideStyles.source}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
+        {t("motionCues.tips.disclaimer")}
+      </Text>
+    </ScrollView>
+  );
+}
+
+// ============================================================
 // iOS Onboarding Slides
 // ============================================================
 
-function IOSSlide1Intro() {
+function IOSSlideIntro() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <View style={slideStyles.center}>
-      <View style={slideStyles.iconBadge}>
+      <Animated.View
+        entering={FadeInDown.duration(motion.slow)}
+        style={slideStyles.iconBadge}
+      >
         <Ionicons name="logo-apple" size={44} color={colors.textPrimary} />
-      </View>
-      <Text
-        style={slideStyles.heading}
-        maxFontSizeMultiplier={fontScaleCaps.heading}
-      >
-        {t("motionCues.ios.onboarding.slide1Title")}
-      </Text>
-      <Text
-        style={slideStyles.subtitle}
-        maxFontSizeMultiplier={fontScaleCaps.body}
-      >
-        {t("motionCues.ios.onboarding.slide1Subtitle")}
-      </Text>
-      <Text
-        style={slideStyles.caption}
-        maxFontSizeMultiplier={fontScaleCaps.body}
-      >
-        {t("motionCues.ios.onboarding.slide1Description")}
-      </Text>
+      </Animated.View>
+      <Animated.View entering={FadeInDown.delay(100).duration(motion.slow)}>
+        <Text
+          style={slideStyles.heading}
+          maxFontSizeMultiplier={fontScaleCaps.heading}
+        >
+          {t("motionCues.ios.onboarding.slide1Title")}
+        </Text>
+      </Animated.View>
+      <Animated.View entering={FadeInDown.delay(200).duration(motion.slow)}>
+        <Text
+          style={slideStyles.subtitle}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
+          {t("motionCues.ios.onboarding.slide1Subtitle")}
+        </Text>
+      </Animated.View>
+      <Animated.View entering={FadeInDown.delay(300).duration(motion.slow)}>
+        <Text
+          style={slideStyles.caption}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
+          {t("motionCues.ios.onboarding.slide1Description")}
+        </Text>
+      </Animated.View>
     </View>
   );
 }
 
-function IOSSlide2Guide() {
+function IOSSlideGuide({ focused }: { focused: boolean }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const slideStyles = useThemedStyles(createSlideStyles);
+  const tabFocused = useIsFocused();
+  // One looping timeline drives the mockup highlight and the step list.
+  const stage = useStageLoop(4, focused && tabFocused);
   return (
     <ScrollView
       style={{ flex: 1 }}
@@ -230,22 +347,27 @@ function IOSSlide2Guide() {
       >
         {t("motionCues.ios.onboarding.slide2Title")}
       </Text>
+      <SettingsPathMockup variant="ios" stage={stage} />
       <View style={slideStyles.steps}>
         <StepItem
           number={1}
           text={t("motionCues.ios.onboarding.slide2Step1")}
+          active={stage === 0}
         />
         <StepItem
           number={2}
           text={t("motionCues.ios.onboarding.slide2Step2")}
+          active={stage === 1}
         />
         <StepItem
           number={3}
           text={t("motionCues.ios.onboarding.slide2Step3")}
+          active={stage === 2}
         />
         <StepItem
           number={4}
           text={t("motionCues.ios.onboarding.slide2Step4")}
+          active={stage === 3}
         />
       </View>
       <View style={slideStyles.tipRow}>
@@ -265,31 +387,38 @@ function IOSSlide2Guide() {
   );
 }
 
-function IOSSlide3DeepLink({ linkFailed }: { linkFailed: boolean }) {
+function IOSSlideDeepLink({ linkFailed }: { linkFailed: boolean }) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const slideStyles = useThemedStyles(createSlideStyles);
   return (
     <View style={slideStyles.center}>
-      <View style={slideStyles.iconBadge}>
+      <Animated.View
+        entering={FadeInDown.duration(motion.slow)}
+        style={slideStyles.iconBadge}
+      >
         <Ionicons
           name="settings-outline"
           size={40}
           color={colors.primary}
         />
-      </View>
-      <Text
-        style={slideStyles.heading}
-        maxFontSizeMultiplier={fontScaleCaps.heading}
-      >
-        {t("motionCues.ios.onboarding.slide3Title")}
-      </Text>
-      <Text
-        style={slideStyles.subtitle}
-        maxFontSizeMultiplier={fontScaleCaps.body}
-      >
-        {t("motionCues.ios.onboarding.slide3Subtitle")}
-      </Text>
+      </Animated.View>
+      <Animated.View entering={FadeInDown.delay(100).duration(motion.slow)}>
+        <Text
+          style={slideStyles.heading}
+          maxFontSizeMultiplier={fontScaleCaps.heading}
+        >
+          {t("motionCues.ios.onboarding.slide3Title")}
+        </Text>
+      </Animated.View>
+      <Animated.View entering={FadeInDown.delay(200).duration(motion.slow)}>
+        <Text
+          style={slideStyles.subtitle}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
+          {t("motionCues.ios.onboarding.slide3Subtitle")}
+        </Text>
+      </Animated.View>
       {linkFailed && (
         <InlineNotice
           variant="warning"
@@ -329,18 +458,58 @@ function FlowItem({
   );
 }
 
-function StepItem({ number, text }: { number: number; text: string }) {
+function StepItem({
+  number,
+  text,
+  active,
+}: {
+  number: number;
+  text: string;
+  /** When set, the number chip animates between highlighted and dimmed. */
+  active?: boolean;
+}) {
+  const { colors } = useTheme();
   const slideStyles = useThemedStyles(createSlideStyles);
+  const isStatic = active === undefined;
+
+  const chipStyle = useAnimatedStyle(() => {
+    if (isStatic) {
+      return {};
+    }
+    return {
+      backgroundColor: withTiming(
+        active ? colors.primary : colors.surfaceTinted,
+        { duration: motion.normal }
+      ),
+      // Emphasize by shrinking the inactive chips — scaling the active one
+      // up would poke past the slide ScrollView's bounds and get clipped.
+      transform: [
+        { scale: withTiming(active ? 1 : 0.92, { duration: motion.normal }) },
+      ],
+    };
+  }, [active, isStatic, colors]);
+
+  const numberStyle = useAnimatedStyle(() => {
+    if (isStatic) {
+      return {};
+    }
+    return {
+      color: withTiming(active ? colors.textOnPrimary : colors.textSecondary, {
+        duration: motion.normal,
+      }),
+    };
+  }, [active, isStatic, colors]);
+
   return (
     <View style={slideStyles.stepItem}>
-      <View style={slideStyles.stepNumber}>
-        <Text
-          style={slideStyles.stepNumberText}
+      <Animated.View style={[slideStyles.stepNumber, chipStyle]}>
+        <Animated.Text
+          style={[slideStyles.stepNumberText, numberStyle]}
           maxFontSizeMultiplier={fontScaleCaps.control}
         >
           {number}
-        </Text>
-      </View>
+        </Animated.Text>
+      </Animated.View>
       <Text
         style={slideStyles.stepText}
         maxFontSizeMultiplier={fontScaleCaps.body}
@@ -371,6 +540,48 @@ async function openAccessibilitySettings(): Promise<boolean> {
 }
 
 // ============================================================
+// Help & Troubleshooting Section
+// ============================================================
+
+const ANDROID_HELP = [
+  ["motionCues.android.help.q1", "motionCues.android.help.a1"],
+  ["motionCues.android.help.q2", "motionCues.android.help.a2"],
+  ["motionCues.android.help.q3", "motionCues.android.help.a3"],
+  ["motionCues.android.help.q4", "motionCues.android.help.a4"],
+] as const;
+
+const IOS_HELP = [
+  ["motionCues.ios.help.q1", "motionCues.ios.help.a1"],
+  ["motionCues.ios.help.q2", "motionCues.ios.help.a2"],
+  ["motionCues.ios.help.q3", "motionCues.ios.help.a3"],
+] as const;
+
+function HelpSection({ items }: { items: typeof ANDROID_HELP | typeof IOS_HELP }) {
+  const { t } = useTranslation();
+  const controlStyles = useThemedStyles(createControlStyles);
+  return (
+    <View style={controlStyles.helpSection}>
+      <Text
+        style={controlStyles.sectionLabel}
+        maxFontSizeMultiplier={fontScaleCaps.body}
+      >
+        {t("motionCues.helpTitle")}
+      </Text>
+      {items.map(([q, a]) => (
+        <CollapsibleCard key={q} title={t(q)}>
+          <Text
+            style={controlStyles.helpBody}
+            maxFontSizeMultiplier={fontScaleCaps.body}
+          >
+            {t(a)}
+          </Text>
+        </CollapsibleCard>
+      ))}
+    </View>
+  );
+}
+
+// ============================================================
 // Motion Style Picker (Android — Regular v1 / Dynamic v2)
 // ============================================================
 
@@ -387,6 +598,48 @@ const MOTION_STYLE_OPTIONS = [
   },
 ] as const;
 
+const SEGMENT_PADDING = 4;
+const SEGMENT_GAP = 2;
+
+function Segment({
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  const { colors } = useTheme();
+  const controlStyles = useThemedStyles(createControlStyles);
+
+  const labelStyle = useAnimatedStyle(
+    () => ({
+      color: withTiming(active ? colors.textOnPrimary : colors.textSecondary, {
+        duration: motion.normal,
+      }),
+    }),
+    [active, colors]
+  );
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={controlStyles.segment}
+      accessibilityRole="radio"
+      accessibilityLabel={label}
+      accessibilityState={{ checked: active }}
+    >
+      <Animated.Text
+        style={[controlStyles.segmentText, labelStyle]}
+        maxFontSizeMultiplier={fontScaleCaps.control}
+      >
+        {label}
+      </Animated.Text>
+    </Pressable>
+  );
+}
+
 function MotionStylePicker({
   value,
   onChange,
@@ -396,8 +649,37 @@ function MotionStylePicker({
 }) {
   const { t } = useTranslation();
   const controlStyles = useThemedStyles(createControlStyles);
-  const activeDescKey = MOTION_STYLE_OPTIONS.find((o) => o.value === value)
-    ?.descKey;
+  const [trackWidth, setTrackWidth] = useState(0);
+
+  const index = Math.max(
+    0,
+    MOTION_STYLE_OPTIONS.findIndex((o) => o.value === value)
+  );
+  const activeDescKey = MOTION_STYLE_OPTIONS[index].descKey;
+
+  const thumbWidth =
+    trackWidth > 0
+      ? (trackWidth - SEGMENT_PADDING * 2 - SEGMENT_GAP) /
+        MOTION_STYLE_OPTIONS.length
+      : 0;
+
+  const thumbStyle = useAnimatedStyle(
+    () => ({
+      transform: [
+        {
+          translateX: withSpring(
+            index * (thumbWidth + SEGMENT_GAP),
+            springs.pill
+          ),
+        },
+      ],
+    }),
+    [index, thumbWidth]
+  );
+
+  const handleTrackLayout = (event: LayoutChangeEvent) => {
+    setTrackWidth(event.nativeEvent.layout.width);
+  };
 
   return (
     <View style={controlStyles.card}>
@@ -407,42 +689,40 @@ function MotionStylePicker({
       >
         {t("motionCues.android.control.styleTitle")}
       </Text>
-      <View style={controlStyles.segmented} accessibilityRole="radiogroup">
-        {MOTION_STYLE_OPTIONS.map(({ value: v, labelKey }) => {
-          const active = value === v;
-          return (
-            <Pressable
-              key={v}
-              onPress={() => onChange(v)}
-              style={[
-                controlStyles.segment,
-                active && controlStyles.segmentActive,
-              ]}
-              accessibilityRole="radio"
-              accessibilityLabel={t(labelKey)}
-              accessibilityState={{ checked: active }}
-            >
-              <Text
-                style={[
-                  controlStyles.segmentText,
-                  active && controlStyles.segmentTextActive,
-                ]}
-                maxFontSizeMultiplier={fontScaleCaps.control}
-              >
-                {t(labelKey)}
-              </Text>
-            </Pressable>
-          );
-        })}
+      <View
+        style={controlStyles.segmented}
+        accessibilityRole="radiogroup"
+        onLayout={handleTrackLayout}
+      >
+        {thumbWidth > 0 && (
+          <Animated.View
+            style={[
+              controlStyles.segmentThumb,
+              { width: thumbWidth },
+              thumbStyle,
+            ]}
+          />
+        )}
+        {MOTION_STYLE_OPTIONS.map(({ value: v, labelKey }) => (
+          <Segment
+            key={v}
+            label={t(labelKey)}
+            active={value === v}
+            onPress={() => onChange(v)}
+          />
+        ))}
       </View>
-      {activeDescKey && (
+      <Animated.View
+        key={activeDescKey}
+        entering={FadeIn.duration(motion.normal)}
+      >
         <Text
           style={controlStyles.cardDescription}
           maxFontSizeMultiplier={fontScaleCaps.body}
         >
           {t(activeDescKey)}
         </Text>
-      )}
+      </Animated.View>
     </View>
   );
 }
@@ -471,6 +751,12 @@ function AndroidControlScreen({
     clearPersistError,
   } = useMotionCues();
   const { settings, updateSettings } = useSettings();
+  const tabFocused = useIsFocused();
+
+  const statusEntrance = useStaggeredEntrance(0);
+  const pickerEntrance = useStaggeredEntrance(1);
+  const actionEntrance = useStaggeredEntrance(2);
+  const helpEntrance = useStaggeredEntrance(3);
 
   // Set once the user has been sent to the system settings list —
   // if they come back still without the permission, show the walk-through
@@ -484,6 +770,16 @@ function AndroidControlScreen({
 
   const showDenied = hasRequested && !hasPermission;
 
+  const statusBorderStyle = useAnimatedStyle(
+    () => ({
+      borderLeftColor: withTiming(
+        isActive ? colors.success : colors.surface,
+        { duration: motion.normal }
+      ),
+    }),
+    [isActive, colors]
+  );
+
   return (
     <ScrollView
       style={{ flex: 1 }}
@@ -493,30 +789,33 @@ function AndroidControlScreen({
       ]}
     >
       {persistError && (
-        <InlineNotice
-          variant="warning"
-          message={
-            persistError === "load"
-              ? t("errors.storageLoad")
-              : t("errors.storageSave")
-          }
-          dismissLabel={t("common.done")}
-          onDismiss={clearPersistError}
-        />
+        <Animated.View
+          entering={FadeIn.duration(motion.normal)}
+          exiting={FadeOut.duration(motion.quick)}
+          layout={LinearTransition.duration(motion.normal)}
+        >
+          <InlineNotice
+            variant="warning"
+            message={
+              persistError === "load"
+                ? t("errors.storageLoad")
+                : t("errors.storageSave")
+            }
+            dismissLabel={t("common.done")}
+            onDismiss={clearPersistError}
+          />
+        </Animated.View>
       )}
 
-      <View
-        style={[
-          controlStyles.statusCard,
-          isActive && controlStyles.statusCardActive,
-        ]}
+      <Animated.View
+        style={[controlStyles.statusCard, statusBorderStyle, statusEntrance]}
+        layout={LinearTransition.duration(motion.normal)}
       >
         <View style={controlStyles.statusRow}>
-          <View
-            style={[
-              controlStyles.statusDot,
-              { backgroundColor: isActive ? colors.success : colors.secondary },
-            ]}
+          <PulsingDot
+            color={isActive ? colors.success : colors.secondary}
+            size={8}
+            pulse={isActive && tabFocused}
           />
           <Text
             style={controlStyles.statusText}
@@ -535,10 +834,15 @@ function AndroidControlScreen({
             ? t("motionCues.android.control.activeDescription")
             : t("motionCues.android.control.inactiveDescription")}
         </Text>
-      </View>
+      </Animated.View>
 
       {!hasMotionSensor && (
-        <View style={controlStyles.warningCard}>
+        <Animated.View
+          style={controlStyles.warningCard}
+          entering={FadeIn.duration(motion.normal)}
+          exiting={FadeOut.duration(motion.quick)}
+          layout={LinearTransition.duration(motion.normal)}
+        >
           <Text
             style={controlStyles.warningTitle}
             maxFontSizeMultiplier={fontScaleCaps.body}
@@ -551,11 +855,16 @@ function AndroidControlScreen({
           >
             {t("motionCues.android.control.sensorMissingDescription")}
           </Text>
-        </View>
+        </Animated.View>
       )}
 
       {hasMotionSensor && !hasPermission && (
-        <View style={controlStyles.warningCard}>
+        <Animated.View
+          style={controlStyles.warningCard}
+          entering={FadeIn.duration(motion.normal)}
+          exiting={FadeOut.duration(motion.quick)}
+          layout={LinearTransition.duration(motion.normal)}
+        >
           <Text
             style={controlStyles.warningTitle}
             maxFontSizeMultiplier={fontScaleCaps.body}
@@ -583,15 +892,23 @@ function AndroidControlScreen({
             size="md"
             fullWidth
           />
-        </View>
+        </Animated.View>
       )}
 
-      <MotionStylePicker
-        value={settings.motionStyle}
-        onChange={(style) => updateSettings({ motionStyle: style })}
-      />
+      <Animated.View
+        style={pickerEntrance}
+        layout={LinearTransition.duration(motion.normal)}
+      >
+        <MotionStylePicker
+          value={settings.motionStyle}
+          onChange={(style) => updateSettings({ motionStyle: style })}
+        />
+      </Animated.View>
 
-      <View style={controlStyles.actionButton}>
+      <Animated.View
+        style={[controlStyles.actionButton, actionEntrance]}
+        layout={LinearTransition.duration(motion.normal)}
+      >
         {isActive ? (
           <Button
             label={t("motionCues.android.control.stopOverlay")}
@@ -610,22 +927,29 @@ function AndroidControlScreen({
             disabled={!hasPermission || !hasMotionSensor}
           />
         )}
-      </View>
+      </Animated.View>
 
-      <Text
-        style={controlStyles.description}
-        maxFontSizeMultiplier={fontScaleCaps.body}
+      <Animated.View
+        style={helpEntrance}
+        layout={LinearTransition.duration(motion.normal)}
       >
-        {t("motionCues.howItWorks")}
-      </Text>
+        <Text
+          style={controlStyles.description}
+          maxFontSizeMultiplier={fontScaleCaps.body}
+        >
+          {t("motionCues.howItWorks")}
+        </Text>
 
-      <Button
-        label={t("motionCues.reviewGuide")}
-        onPress={onReviewGuide}
-        variant="ghost"
-        size="md"
-        fullWidth
-      />
+        <HelpSection items={ANDROID_HELP} />
+
+        <Button
+          label={t("motionCues.reviewGuide")}
+          onPress={onReviewGuide}
+          variant="ghost"
+          size="md"
+          fullWidth
+        />
+      </Animated.View>
     </ScrollView>
   );
 }
@@ -652,6 +976,10 @@ function IOSControlScreen({
   } = useMotionCues();
   const [linkFailed, setLinkFailed] = useState(false);
 
+  const appleCardEntrance = useStaggeredEntrance(0);
+  const overlayCardEntrance = useStaggeredEntrance(1);
+  const helpEntrance = useStaggeredEntrance(2);
+
   const iosMajor =
     Platform.OS === "ios"
       ? parseInt(String(Platform.Version).split(".")[0] ?? "0", 10)
@@ -672,30 +1000,43 @@ function IOSControlScreen({
       ]}
     >
       {persistError && (
-        <InlineNotice
-          variant="warning"
-          message={
-            persistError === "load"
-              ? t("errors.storageLoad")
-              : t("errors.storageSave")
-          }
-          dismissLabel={t("common.done")}
-          onDismiss={clearPersistError}
-        />
+        <Animated.View
+          entering={FadeIn.duration(motion.normal)}
+          exiting={FadeOut.duration(motion.quick)}
+          layout={LinearTransition.duration(motion.normal)}
+        >
+          <InlineNotice
+            variant="warning"
+            message={
+              persistError === "load"
+                ? t("errors.storageLoad")
+                : t("errors.storageSave")
+            }
+            dismissLabel={t("common.done")}
+            onDismiss={clearPersistError}
+          />
+        </Animated.View>
       )}
 
       {isUnsupported && (
-        <View style={controlStyles.warningCard}>
+        <Animated.View
+          style={controlStyles.warningCard}
+          entering={FadeIn.duration(motion.normal)}
+          layout={LinearTransition.duration(motion.normal)}
+        >
           <Text
             style={controlStyles.warningText}
             maxFontSizeMultiplier={fontScaleCaps.body}
           >
             {t("motionCues.ios.control.unsupportedVersion")}
           </Text>
-        </View>
+        </Animated.View>
       )}
 
-      <View style={controlStyles.card}>
+      <Animated.View
+        style={[controlStyles.card, appleCardEntrance]}
+        layout={LinearTransition.duration(motion.normal)}
+      >
         <View style={controlStyles.cardTitleRow}>
           <Ionicons name="logo-apple" size={18} color={colors.textPrimary} />
           <Text
@@ -706,7 +1047,10 @@ function IOSControlScreen({
           </Text>
         </View>
         {iosAppleCuesConfirmed && (
-          <View style={controlStyles.cardStatusRow}>
+          <Animated.View
+            style={controlStyles.cardStatusRow}
+            entering={FadeIn.duration(motion.normal)}
+          >
             <Ionicons
               name="checkmark-circle"
               size={16}
@@ -718,7 +1062,7 @@ function IOSControlScreen({
             >
               {t("motionCues.ios.control.appleCuesEnabled")}
             </Text>
-          </View>
+          </Animated.View>
         )}
         <Text
           style={controlStyles.cardDescription}
@@ -734,15 +1078,23 @@ function IOSControlScreen({
           fullWidth
         />
         {linkFailed && (
-          <InlineNotice
-            variant="warning"
-            message={t("motionCues.ios.control.openSettingsFailed")}
-            title={t("motionCues.ios.control.openSettingsFallback")}
-          />
+          <Animated.View
+            entering={FadeIn.duration(motion.normal)}
+            exiting={FadeOut.duration(motion.quick)}
+          >
+            <InlineNotice
+              variant="warning"
+              message={t("motionCues.ios.control.openSettingsFailed")}
+              title={t("motionCues.ios.control.openSettingsFallback")}
+            />
+          </Animated.View>
         )}
-      </View>
+      </Animated.View>
 
-      <View style={controlStyles.card}>
+      <Animated.View
+        style={[controlStyles.card, overlayCardEntrance]}
+        layout={LinearTransition.duration(motion.normal)}
+      >
         <View style={controlStyles.cardHeader}>
           <View style={{ flex: 1 }}>
             <Text
@@ -766,15 +1118,22 @@ function IOSControlScreen({
             accessibilityLabel={t("motionCues.ios.control.inAppOverlay")}
           />
         </View>
-      </View>
+      </Animated.View>
 
-      <Button
-        label={t("motionCues.reviewGuide")}
-        onPress={onReviewGuide}
-        variant="ghost"
-        size="md"
-        fullWidth
-      />
+      <Animated.View
+        style={helpEntrance}
+        layout={LinearTransition.duration(motion.normal)}
+      >
+        <HelpSection items={IOS_HELP} />
+
+        <Button
+          label={t("motionCues.reviewGuide")}
+          onPress={onReviewGuide}
+          variant="ghost"
+          size="md"
+          fullWidth
+        />
+      </Animated.View>
     </ScrollView>
   );
 }
@@ -826,7 +1185,7 @@ export default function MotionCuesScreen() {
         ? [
             {
               key: "a1",
-              render: () => <AndroidSlide1Demo />,
+              render: (focused) => <AndroidSlideDemo focused={focused} />,
               primaryCta: {
                 label: t("common.next"),
                 onPress: () => {},
@@ -834,7 +1193,7 @@ export default function MotionCuesScreen() {
             },
             {
               key: "a2",
-              render: () => <AndroidSlide2Explanation />,
+              render: () => <AndroidSlideExplanation />,
               primaryCta: {
                 label: t("common.next"),
                 onPress: () => {},
@@ -842,7 +1201,17 @@ export default function MotionCuesScreen() {
             },
             {
               key: "a3",
-              render: () => <AndroidSlide3Permission />,
+              render: () => <TipsSlide />,
+              primaryCta: {
+                label: t("common.next"),
+                onPress: () => {},
+              },
+            },
+            {
+              key: "a4",
+              render: (focused) => (
+                <AndroidSlidePermission focused={focused} />
+              ),
               primaryCta: {
                 label: t("motionCues.android.onboarding.slide3Grant"),
                 onPress: async () => {
@@ -861,7 +1230,7 @@ export default function MotionCuesScreen() {
         : [
             {
               key: "i1",
-              render: () => <IOSSlide1Intro />,
+              render: () => <IOSSlideIntro />,
               primaryCta: {
                 label: t("motionCues.ios.onboarding.slide1Cta"),
                 onPress: () => {},
@@ -869,7 +1238,7 @@ export default function MotionCuesScreen() {
             },
             {
               key: "i2",
-              render: () => <IOSSlide2Guide />,
+              render: (focused) => <IOSSlideGuide focused={focused} />,
               primaryCta: {
                 label: t("motionCues.ios.onboarding.slide2Cta"),
                 onPress: () => {},
@@ -877,7 +1246,15 @@ export default function MotionCuesScreen() {
             },
             {
               key: "i3",
-              render: () => <IOSSlide3DeepLink linkFailed={slideLinkFailed} />,
+              render: () => <TipsSlide />,
+              primaryCta: {
+                label: t("common.next"),
+                onPress: () => {},
+              },
+            },
+            {
+              key: "i4",
+              render: () => <IOSSlideDeepLink linkFailed={slideLinkFailed} />,
               primaryCta: {
                 label: t("motionCues.ios.onboarding.slide3Cta"),
                 onPress: async () => {
@@ -902,7 +1279,7 @@ export default function MotionCuesScreen() {
           title={t("motionCues.title")}
           compact
         />
-        <OnboardingSlides slides={slides} />
+        <OnboardingSlides slides={slides} onSkip={handleComplete} />
       </View>
     );
   }
@@ -1022,6 +1399,10 @@ const createSlideStyles = (colors: ThemeColors) =>
       backgroundColor: colors.secondary,
       marginVertical: 2,
     },
+    tipsList: {
+      gap: spacing.sm,
+      marginVertical: spacing.md,
+    },
     source: {
       fontFamily: fonts.regular,
       fontSize: fontSizes.xs,
@@ -1123,22 +1504,15 @@ const createControlStyles = (colors: ThemeColors) =>
       backgroundColor: colors.surface,
       padding: spacing.lg,
       borderRadius: borderRadius.lg,
-      ...shadows.sm,
-    },
-    statusCardActive: {
       borderLeftWidth: 4,
-      borderLeftColor: colors.success,
+      borderLeftColor: colors.surface,
+      ...shadows.sm,
     },
     statusRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: spacing.sm,
       marginBottom: spacing.xs,
-    },
-    statusDot: {
-      width: 10,
-      height: 10,
-      borderRadius: 5,
     },
     statusText: {
       fontFamily: fonts.semiBold,
@@ -1177,6 +1551,26 @@ const createControlStyles = (colors: ThemeColors) =>
       lineHeight: 22,
       marginTop: spacing.md,
       paddingHorizontal: spacing.sm,
+    },
+    helpSection: {
+      gap: spacing.sm,
+      marginTop: spacing.lg,
+      marginBottom: spacing.sm,
+    },
+    sectionLabel: {
+      fontFamily: fonts.semiBold,
+      fontSize: fontSizes.xs,
+      color: colors.textTertiary,
+      letterSpacing: letterSpacing.wide + 0.5,
+      textTransform: "uppercase",
+      paddingHorizontal: spacing.sm,
+      marginBottom: spacing.xs,
+    },
+    helpBody: {
+      fontFamily: fonts.regular,
+      fontSize: fontSizes.sm,
+      color: colors.textSecondary,
+      lineHeight: 20,
     },
     card: {
       backgroundColor: colors.surface,
@@ -1221,8 +1615,16 @@ const createControlStyles = (colors: ThemeColors) =>
       flexDirection: "row",
       backgroundColor: colors.surfaceTinted,
       borderRadius: borderRadius.md,
-      padding: 4,
-      gap: 2,
+      padding: SEGMENT_PADDING,
+      gap: SEGMENT_GAP,
+    },
+    segmentThumb: {
+      position: "absolute",
+      top: SEGMENT_PADDING,
+      bottom: SEGMENT_PADDING,
+      left: SEGMENT_PADDING,
+      borderRadius: borderRadius.sm,
+      backgroundColor: colors.primary,
     },
     segment: {
       flex: 1,
@@ -1232,15 +1634,8 @@ const createControlStyles = (colors: ThemeColors) =>
       alignItems: "center",
       justifyContent: "center",
     },
-    segmentActive: {
-      backgroundColor: colors.primary,
-    },
     segmentText: {
       fontFamily: fonts.semiBold,
       fontSize: fontSizes.sm,
-      color: colors.textSecondary,
-    },
-    segmentTextActive: {
-      color: colors.textOnPrimary,
     },
   });
