@@ -14,6 +14,7 @@
     "off": "Off",
     "back": "Back",
     "close": "Close",
+    "skip": "Skip",
     "retry": "Try again",
     "stepIndicator": "Step {{current}} of {{total}}"
   },
@@ -77,6 +78,16 @@
     "title": "Motion Cues",
     "howItWorks": "8 subtle dots on your screen edges move with your vehicle's motion, helping your brain reconcile what your eyes see with what your body feels.",
     "reviewGuide": "Review the guide",
+    "tips": {
+      "title": "Get the best results",
+      "subtitle": "Small habits that make the cues work harder for you.",
+      "tip1": "Turn on the cues before the ride starts — prevention beats reaction.",
+      "tip2": "Keep your phone where you can see it, ideally mounted or held steady.",
+      "tip3": "Pair with the 100 Hz audio session for sound and visual relief.",
+      "tip4": "Still feeling unwell? Look at the horizon and rest your eyes off the screen.",
+      "disclaimer": "Serene may help reduce motion sickness symptoms — results vary from person to person."
+    },
+    "helpTitle": "Help & troubleshooting",
     "notification": {
       "title": "Serene — Motion Cues active",
       "text": "Helping reduce motion sickness"
@@ -121,6 +132,16 @@
         "deniedTitle": "Permission not granted yet",
         "deniedDescription": "In the settings list, find Serene and turn on \"Display over other apps\", then come back.",
         "reopenSettings": "Open Settings again"
+      },
+      "help": {
+        "q1": "The dots don't appear over other apps",
+        "a1": "Check that \"Display over other apps\" is granted, then stop and start the overlay again.",
+        "q2": "The dots freeze or disappear after a while",
+        "a2": "Battery optimization may be stopping the service. In Settings → Battery, set Serene to Unrestricted (names vary by device).",
+        "q3": "Why is there a persistent notification?",
+        "a3": "Android requires a notification while an overlay service runs. It's set to minimum importance — silent and collapsed.",
+        "q4": "The settings screen looks different on my device",
+        "a4": "On Android 11 and newer, the system opens a list of all apps — find Serene there. On older versions it opens Serene's page directly. Manufacturer skins may rename the setting."
       }
     },
     "ios": {
@@ -151,6 +172,20 @@
         "unsupportedVersion": "This feature requires iOS 18 or later. Please update your iPhone.",
         "openSettingsFailed": "Couldn't open Settings automatically.",
         "openSettingsFallback": "Open Settings → Accessibility → Motion → Vehicle Motion Cues manually."
+      },
+      "help": {
+        "q1": "I can't find Vehicle Motion Cues",
+        "a1": "It requires iOS 18 or later on iPhone 12 and newer. Update iOS in Settings → General → Software Update, then look under Accessibility → Motion.",
+        "q2": "Where is the setting exactly?",
+        "a2": "Settings → Accessibility → Motion → Vehicle Motion Cues. Choose Automatic so your iPhone shows the dots only while you're in a moving vehicle.",
+        "q3": "Why does Serene's overlay only work inside the app?",
+        "a3": "Apple doesn't allow third-party apps to draw over other apps. For system-wide dots, use Apple's built-in Vehicle Motion Cues."
+      },
+      "mockup": {
+        "settings": "Settings",
+        "accessibility": "Accessibility",
+        "motionRow": "Motion",
+        "vehicleCues": "Vehicle Motion Cues"
       }
     }
   },
