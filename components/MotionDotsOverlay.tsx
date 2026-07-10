@@ -7,6 +7,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   ReduceMotion,
+  type SharedValue,
 } from "react-native-reanimated";
 import { MOTION_CUES_CONFIG } from "@/constants/config";
 import { springs } from "@/constants/theme";
@@ -38,40 +39,27 @@ type MotionDotProps = {
   position: ViewStyle;
   size: number;
   opacity: number;
-  sensitivity: number;
   color: string;
   borderColor: string;
+  offsetX: SharedValue<number>;
+  offsetY: SharedValue<number>;
 };
 
 // The dot springs ARE the therapy — they must keep moving even when the
 // user (or OS) asks for reduced motion, hence ReduceMotion.Never.
 const DOT_SPRING = { ...springs.dot, reduceMotion: ReduceMotion.Never };
 
+// All dots follow the same offsets, so one accelerometer listener in the
+// parent feeds a single shared-value pair — not one subscription per dot.
 function MotionDot({
   position,
   size,
   opacity,
-  sensitivity,
   color,
   borderColor,
+  offsetX,
+  offsetY,
 }: MotionDotProps) {
-  const offsetX = useSharedValue(0);
-  const offsetY = useSharedValue(0);
-
-  useEffect(() => {
-    Accelerometer.setUpdateInterval(MOTION_CUES_CONFIG.sensorUpdateInterval);
-    const subscription = Accelerometer.addListener(({ x, y }) => {
-      // Invert X: car turns right → dots shift left (matches Apple)
-      offsetX.value = withSpring(-x * sensitivity * 10, DOT_SPRING);
-      // Positive Y: car accelerates → dots shift down
-      offsetY.value = withSpring(y * sensitivity * 10, DOT_SPRING);
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [sensitivity, offsetX, offsetY]);
-
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: offsetX.value },
@@ -107,12 +95,34 @@ export function MotionDotsOverlay({ visible }: MotionDotsOverlayProps) {
   const { settings } = useSettings();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const offsetX = useSharedValue(0);
+  const offsetY = useSharedValue(0);
+
+  const sensitivity =
+    MOTION_CUES_CONFIG.sensitivityMultipliers[settings.sensitivity];
+
+  useEffect(() => {
+    if (!visible) {
+      offsetX.value = 0;
+      offsetY.value = 0;
+      return;
+    }
+    Accelerometer.setUpdateInterval(MOTION_CUES_CONFIG.sensorUpdateInterval);
+    const subscription = Accelerometer.addListener(({ x, y }) => {
+      // Invert X: car turns right → dots shift left (matches Apple)
+      offsetX.value = withSpring(-x * sensitivity * 10, DOT_SPRING);
+      // Positive Y: car accelerates → dots shift down
+      offsetY.value = withSpring(y * sensitivity * 10, DOT_SPRING);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [visible, sensitivity, offsetX, offsetY]);
 
   if (!visible) return null;
 
   const size = MOTION_CUES_CONFIG.dotSizes[settings.dotSize];
-  const sensitivity =
-    MOTION_CUES_CONFIG.sensitivityMultipliers[settings.sensitivity];
   const positions = getDotPositions(insets);
 
   return (
@@ -123,9 +133,10 @@ export function MotionDotsOverlay({ visible }: MotionDotsOverlayProps) {
           position={position}
           size={size}
           opacity={settings.dotOpacity}
-          sensitivity={sensitivity}
           color={colors.motionDot}
           borderColor={colors.motionDotBorder}
+          offsetX={offsetX}
+          offsetY={offsetY}
         />
       ))}
     </View>

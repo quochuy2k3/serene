@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { useIsFocused } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, { FadeOut, LinearTransition } from "react-native-reanimated";
 import {
@@ -41,6 +42,9 @@ export default function HomeScreen() {
   const { settings, updateSettings, isLoaded } = useSettings();
   const { colors } = useTheme();
   const styles = useThemedStyles(createStyles);
+  // Tab scenes stay mounted (detachInactiveScreens={false}) — stop the
+  // status pulse from animating while another tab is open.
+  const tabFocused = useIsFocused();
 
   const overlayOn = Platform.OS === "android" ? isActive : iosOverlayEnabled;
   const showWelcome = isLoaded && !settings.welcomeSeen;
@@ -235,7 +239,7 @@ export default function HomeScreen() {
                 <PulsingDot
                   color={overlayOn ? colors.success : colors.textTertiary}
                   size={6}
-                  pulse={overlayOn}
+                  pulse={overlayOn && tabFocused}
                 />
                 <Text
                   style={[
