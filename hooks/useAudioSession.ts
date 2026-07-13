@@ -25,6 +25,10 @@ export function useAudioSession() {
   const stateRef = useRef<AudioState>(state);
   stateRef.current = state;
   const loadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // A play was requested but the player wasn't loaded yet — start it as soon
+  // as loading finishes (see the effect below). Issuing seekTo/play on an
+  // unloaded player is undefined behaviour in expo-audio and can wedge it.
+  const wantsPlayRef = useRef(false);
 
   // Configure audio to play even in silent mode
   useEffect(() => {
@@ -82,23 +86,48 @@ export function useAudioSession() {
     clearLoadTimeout,
   ]);
 
-  const start = useCallback(() => {
-    if (stateRef.current === "playing") return;
-
+  // Actually kick off playback from the top. Only safe once the player is
+  // loaded; callers must guard on player.isLoaded or defer via wantsPlayRef.
+  const beginPlayback = useCallback(() => {
+    wantsPlayRef.current = false;
     clearLoadTimeout();
     try {
       player.seekTo(0);
       player.play();
-      setState("playing");
-      loadTimeoutRef.current = setTimeout(() => {
-        if (stateRef.current === "playing" && !player.isLoaded) {
-          setState("error");
-        }
-      }, LOAD_TIMEOUT_MS);
     } catch {
       setState("error");
     }
   }, [player, clearLoadTimeout]);
+
+  const start = useCallback(() => {
+    if (stateRef.current === "playing") return;
+
+    clearLoadTimeout();
+    setState("playing");
+
+    if (player.isLoaded) {
+      beginPlayback();
+      return;
+    }
+
+    // Player still loading (common when the screen was just re-mounted, e.g.
+    // Done → Listen again). Defer play until load finishes; only surface an
+    // error if the asset genuinely never loads within the timeout.
+    wantsPlayRef.current = true;
+    loadTimeoutRef.current = setTimeout(() => {
+      if (stateRef.current === "playing" && wantsPlayRef.current && !player.isLoaded) {
+        wantsPlayRef.current = false;
+        setState("error");
+      }
+    }, LOAD_TIMEOUT_MS);
+  }, [player, beginPlayback, clearLoadTimeout]);
+
+  // A play was requested before the player finished loading → start it now.
+  useEffect(() => {
+    if (wantsPlayRef.current && status.isLoaded) {
+      beginPlayback();
+    }
+  }, [status.isLoaded, beginPlayback]);
 
   const resume = useCallback(() => {
     if (stateRef.current !== "interrupted") return;
@@ -111,6 +140,7 @@ export function useAudioSession() {
   }, [player]);
 
   const stop = useCallback(() => {
+    wantsPlayRef.current = false;
     clearLoadTimeout();
     try {
       player.pause();
