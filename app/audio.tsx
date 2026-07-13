@@ -132,6 +132,19 @@ export default function AudioScreen() {
               >
                 {t("audio.volumeTip")}
               </Text>
+              <View style={styles.timingRow}>
+                <Ionicons
+                  name="time-outline"
+                  size={16}
+                  color={colors.textAccent}
+                />
+                <Text
+                  style={styles.timingText}
+                  maxFontSizeMultiplier={fontScaleCaps.body}
+                >
+                  {t("audio.timingTip")}
+                </Text>
+              </View>
               <Text
                 style={styles.guideExplainer}
                 maxFontSizeMultiplier={fontScaleCaps.body}
@@ -283,6 +296,23 @@ const createStyles = (colors: ThemeColors) =>
       fontFamily: fonts.regular,
       fontSize: fontSizes.sm,
       color: colors.textSecondary,
+      lineHeight: fontSizes.sm * lineHeights.normal,
+    },
+    timingRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.sm,
+      backgroundColor: colors.primarySoft,
+      borderRadius: borderRadius.sm,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      marginTop: spacing.xs,
+    },
+    timingText: {
+      flex: 1,
+      fontFamily: fonts.semiBold,
+      fontSize: fontSizes.sm,
+      color: colors.textAccent,
       lineHeight: fontSizes.sm * lineHeights.normal,
     },
     guideExplainer: {

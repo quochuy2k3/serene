@@ -1,8 +1,13 @@
+/**
+ * The 100 Hz session. Matches the only human protocol with a reported effect
+ * (Nagoya University 2025): a 1-minute pure 100 Hz tone at conversational level,
+ * taken BEFORE motion. That study used near-field speakers, not headphones, and
+ * has not been independently replicated — copy must stay hedged accordingly.
+ */
 export const AUDIO_CONFIG = {
   frequency: 100,
   duration: 60,
   type: "sine" as const,
-  effectDurationHours: 2,
 } as const;
 
 export const MOTION_CUES_CONFIG = {
